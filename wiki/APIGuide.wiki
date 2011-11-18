@@ -10,7 +10,7 @@ The org.oboformat codebase provides two key components:
   * A *translator*, which translates *OBODocument* objects into [http://owlapi.sourceforge.net/javadoc/org/semanticweb/owlapi/model/OWLOntology.html OWLOntology] objects
 
 
-It is *strongly recommended* that software applications using this library performs both steps and consume OWLOntology objects. The following advantages are gained:
+It is *strongly recommended* that software applications using this library performs *both* steps and consume *OWLOntology objects*, rather than using OBODoc objects, which are intended as intermediate structures. The following advantages are gained:
 
  * That application is then able to work with both obo *and* owl documents
  * The application is future-proofed in the case of the input ontology moving to OWL as it's primary format
