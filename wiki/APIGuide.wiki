@@ -59,12 +59,14 @@ import org.semanticweb.owlapi.model.*;
 
 public class ExportLabelsAsOWL {
 
-	public static void main(String[] args) throws IOException, OWLOntologyCreationException, OWLOntologyStorageException {
-		// create a parser object and get an OBO Document (first arg)
+	public static void main(String[] args) 
+           throws IOException, OWLOntologyCreationException,
+                  OWLOntologyStorageException {
+		// create a parser object and get an OBO Document
 		OBOFormatParser p = new OBOFormatParser();
 		OBODoc obodoc = p.parse(args[0]);
 
-		// create a translator object and feed it the OBO Document
+		// create a translator object and feed it the OBODoc
 		Obo2Owl bridge = new Obo2Owl();
 		OWLOntologyManager manager = bridge.getManager();
 		OWLOntology ontology = bridge.convert(obodoc);
@@ -72,7 +74,7 @@ public class ExportLabelsAsOWL {
 
 }}}
 
-[http://oboformat.googlecode.com/svn/trunk/src/org/obolibrary/examples/ExportLabelsAsOWL.java see examples]
+[http://oboformat.googlecode.com/svn/trunk/src/org/obolibrary/examples/ExportLabelsAsOWL.java see full example]
 
 = Using OWLTools =
 
