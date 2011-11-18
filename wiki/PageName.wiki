@@ -6,8 +6,9 @@ This document provides guidelines for parsing OBO-Format documents using the ref
 
 The org.oboformat codebase provides two key components:
 
-  * A *parser*, which translates obo-format documents into obo *document* objects
-  * A *translator*, which translates obo *document* objects into OWLOntology objects (depends on OWLAPI)
+  * A *parser*, which translates obo-format documents into *OBODocument* objects
+  * A *translator*, which translates *OBODocument* objects into [http://owlapi.sourceforge.net/javadoc/org/semanticweb/owlapi/model/OWLOntology.html OWLOntology] objects
+
 
 It is *strongly recommended* that software applications using this library performs both steps and consume OWLOntology objects. The following advantages are gained:
 
