@@ -49,6 +49,7 @@ Note that the data model implementation is fairly generic, and does not include 
 
 == Using the OBO Format parser to generate OWLOntology objects ==
 
+The *recommended* way to use this API is to skip the intermediate OBODoc representation and use the OWLAPI once the OBODoc has been translated to OWL.
 
 {{{
 import org.obolibrary.obo2owl.*;
