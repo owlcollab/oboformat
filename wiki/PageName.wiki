@@ -17,10 +17,12 @@ It is *strongly recommended* that software applications using this library perfo
 
 Whilst it is true that this library can perform a reverse lossy translation from OWL to OBO-Format, use of the obo document objects in inherently limited, as these will never support all OWL constructs
 
-= Using the OBO Format parser without translation to OWL =
+== Using the OBO Format parser without translation to OWL ==
+
+See notes above. It is strongly recommended you use the OWLAPI
 
 TODO
 
-= Using the OBO Format parser to generate OWLOntology objects =
+== Using the OBO Format parser to generate OWLOntology objects ==
 
 TODO
