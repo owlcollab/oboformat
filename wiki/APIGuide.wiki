@@ -20,9 +20,28 @@ Whilst it is true that this library can perform a reverse lossy translation from
 
 == Using the OBO Format parser without translation to OWL ==
 
-See notes above. It is strongly recommended you use the OWLAPI
+See notes above. It is strongly recommended you use parse into OWLAPI OWLOntology objects, and use the OWLAPI (or an API that wraps the OWLAPI) to perform ontology operations.
 
-TODO
+However, if you have a strong need to work at the level of OBO documents, here is a basic guide. The top level object is an OBODoc, which represents the contents of a single OBO-Format file. An OBODoc can be obtained like this:
+
+{{{
+import org.obolibrary.oboformat.model.*;
+
+public class Test {
+  public static void main(String[] args) {
+    OBOFormatParser p = new OBOFormatParser();
+    OBODoc obodoc = p.parse("go.obo");
+    ...
+  }
+}
+}}}
+
+Each OBODoc consists of multiple *frames*, with each frame consisting of *clauses*. The data model maps directly to the [http://purl.obolibrary.org/obo/oboformat/spec.html OBO-Format specifcation].
+
+In particular, see:
+
+  * [http://purl.obolibrary.org/obo/oboformat/spec.html#3 Section 3], which specifies the basic document structure.
+  * [http://purl.obolibrary.org/obo/oboformat/spec.html#4 Section 4], which specifies cardinality constraints for different clause types.
 
 == Using the OBO Format parser to generate OWLOntology objects ==
 
