@@ -79,4 +79,19 @@ public class ExportLabelsAsOWL {
 
 = Using OWLTools =
 
-[http://code.google.com/p/owltools/ OWLTools]
+For programmers making the transition from the OBO-format world, the OWL API can be overwhelming. The [http://code.google.com/p/owltools/ OWLTools] library provides a simple facade on top of the OWL API that simplifies the following operations:
+
+ * Fetching OBO-metadata, including synonyms, text definitions, subsets/slims, etc
+ * Traversing the ontology graph
+
+OWLTools also includes utility packages for graph visualization, comparing based on semantic similarity, etc.
+
+If you intend to use OWLTools then you can *skip these org.oboformat docs entirely*. OWLTools transparently accepts obo or owl files, translating them to OWLOntology objects behind the scenes.
+
+= Direct use from the OWLAPI =
+
+Note that at this time, the OWLAPI contains an obo parser that precedes this one. This parser may be fine for some purposes, but it doesn't support the full spec.
+
+*We hope to integrate this parser and translator into the OWLAPI in the future*, thus allowing you to treat obo format as any other OWL serialization (albeit an idiosyncratic, incomplete one).
+
+For the current time, you need to explicitly translate obo documents. Apologies for the inconvenience.
