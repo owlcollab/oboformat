@@ -47,7 +47,6 @@ Note that the data model implementation is fairly generic, and does not include 
 
 == Using the OBO Format parser to generate OWLOntology objects ==
 
-
 {{{
 import org.obolibrary.obo2owl.*;
 import org.obolibrary.oboformat.model.*;
@@ -71,3 +70,5 @@ public class ExportLabelsAsOWL {
 }}}
 
 [http://oboformat.googlecode.com/svn/trunk/src/org/obolibrary/examples/ExportLabelsAsOWL.java see examples]
+
+See the [http://owlapi.sourceforge.net/javadoc OWLAPI java docs], e.g. for [http://owlapi.sourceforge.net/javadoc/org/semanticweb/owlapi/model/OWLOntology.html OWLOntology].
