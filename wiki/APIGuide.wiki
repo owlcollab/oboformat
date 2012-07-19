@@ -75,7 +75,7 @@ public class ExportLabelsAsOWL {
 
 }}}
 
-[http://oboformat.googlecode.com/svn/trunk/src/org/obolibrary/examples/ExportLabelsAsOWL.java see full example]
+[http://oboformat.googlecode.com/svn/trunk/src/main/java/org/obolibrary/examples/ExportLabelsAsOWL.java see full example]
 
 = Using OWLTools =
 
