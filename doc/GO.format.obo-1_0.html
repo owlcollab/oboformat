@@ -1,0 +1,974 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>The OBO Flat File Format Specification, version 1.0</title>
+        <link href="owl.css" rel="stylesheet" type="text/css" />
+        <link href="wg.css" rel="stylesheet" type="text/css" />
+<!--#include file="page-head.html" -->
+</head>
+<body>
+<!--#include file="header.html" -->
+<div id="wrapper">
+<!-- page content starts here -->
+	<div id="main">
+		<h1>The OBO Flat File Format Specification, version&nbsp;1.0</h1>
+		<p>
+			<span class="addr"><span class="id">john.richter</span>@<span class="place">aya.yale.edu</span> (<span class="name">John Day-Richter</span>)</span>
+			<br>
+			February 3, 2004
+		</p>
+		<p>
+			OBO format is the text file format used by <a href="http://www.oboedit.org">OBO-Edit</a>, the open source, platform-independent application for viewing and editing ontologies. See also the <a href="GO.java.obo.parser.html">Java OBO parser guide</a>, which gives details of the OBO parser implemented as part of OBO-Edit, and how to use it.
+		</p>
+		<p>
+			Please note that <a href="GO.format.obo-1_2.html" title="OBO 1.2 file format guide">OBO 1.2</a> is the file format used and recommended by the GO Consortium.
+		</p>
+		<div id="navPage">
+			<ul>
+				<li class="h2">
+					<a href="#syn">OBO 1.0 Format Syntax</a>
+				</li>
+				<li class="h3">
+					<a href="#st">Document Structure</a>
+				</li>
+				<li class="h3">
+					<a href="#tag">Tag-Value Pairs</a>
+				</li>
+				<li class="h3">
+					<a href="#docu">Document Header Tags</a>
+				</li>
+				<li class="h3">
+					<a href="#sta">Stanza Types</a>
+				</li>
+				<li class="h3">
+					<a href="#tags">Tags in a [Term] stanza</a>
+				</li>
+				<li class="h3">
+					<a href="#dbxrefformat">Dbxref Formatting</a>
+				</li>
+				<li class="h3">
+					<a href="#type">Tags in [Typedef] Stanza</a>
+				</li>
+				<li class="h2">
+					<a href="#par">Parser Requirements</a>
+				</li>
+				<li class="h3">
+					<a href="#gen">General behavior</a>
+				</li>
+				<li class="h3">
+					<a href="#lin">Line parsing errors</a>
+				</li>
+				<li class="h3">
+					<a href="#com">! Comments</a>
+				</li>
+				<li class="h3">
+					<a href="#unr">Unrecognized tags</a>
+				</li>
+				<li class="h3">
+					<a href="#hed">Optional header tags</a>
+				</li>
+				<li class="h3">
+					<a href="#unk">Dbxrefs with unknown types</a>
+				</li>
+				<li class="h3">
+					<a href="#dang">Dangling references</a>
+				</li>
+				<li class="h3">
+					<a href="#graf">Graph Structure</a>
+				</li>
+				<li class="h3">
+					<a href="#desk">Dbxref descriptions</a>
+				</li>
+				<li class="h3">
+					<a href="#cereal">Serializer Conventions</a>
+				</li>
+				<li class="h3">
+					<a href="#startrek">General conventions</a>
+				</li>
+				<li class="h3">
+					<a href="#more">Stanza conventions</a>
+				</li>
+				<li class="h3">
+					<a href="#dere">Header tags</a>
+				</li>
+				<li class="h3">
+					<a href="#stan">Ordering Term and Typedef stanzas</a>
+				</li>
+				<li class="h3">
+					<a href="#typedef">Term and Typedef tags</a>
+				</li>
+				<li class="h3">
+					<a href="#list">Dbxref lists</a>
+				</li>
+				<li class="h2">
+					<a href="#eg">An example file</a>
+				</li>
+			</ul>
+		</div>
+		<div class="block">
+			<h2 id="syn">OBO 1.0 Format Syntax </h2> <h3 id="st">Document Structure</h3>
+			<p>
+				The format is basically an extension of the tag-value format of the GO definitions file, with a few modifications. One important difference is that <em>unrecognized tags in any context do not necessarily generate fatal errors</em> (although some parsers may decide to do so; see <a href="#par">Parser Requirements</a> below). This allows parsers to read and work with files that contain information not used by a particular tool.
+			</p>
+			<p>
+				A document in the new format would be structured as follows:
+			</p>
+			<div class="fmt">
+				<p>
+					<code> &lt;header&gt;
+						<br>
+						&lt;stanza&gt;
+						<br>
+						&lt;stanza&gt;
+						<br>
+						... </code>
+				</p>
+			</div>
+			<p>
+				A "stanza" is a labeled section of the document, indicating that an object of a particular type is being described. Stanzas are structured as follows:
+			</p>
+			<div class="fmt">
+				<p>
+					<code> [&lt;Object type&gt;]
+						<br>
+						&lt;tag&gt;: &lt;value&gt;
+						<br>
+						&lt;tag&gt;: &lt;value&gt;
+						<br>
+						... </code>
+				</p>
+			</div>
+			<p>
+				Blank lines are ignored.
+			</p>
+			<h3 id="tag">Tag-Value Pairs</h3>
+			<p>
+				Each stanza consists of a series of tag-value pairs. Tag-value pairs consist of a tag name, an unescaped colon, the tag value, and then a newline:
+			</p>
+			<div class="fmt">
+				<p>
+					<code> &lt;tag name&gt;:&lt;tag value&gt; </code>
+				</p>
+			</div>
+			<p>
+				All tag-value pairs occur on a <em>single</em> line, unless the lines are broken by \&lt;newline&gt; combinations.
+			</p>
+			<p>
+				Both the tag name and tag value may contain the following escape characters:
+			</p>
+			<dl class="tableMid codeList">
+				<dt>
+					\n
+				</dt>
+				<dd>
+					newline
+				</dd>
+				<dt>
+					\W
+				</dt>
+				<dd>
+					whitespace
+				</dd>
+				<dt>
+					\t
+				</dt>
+				<dd>
+					tab
+				</dd>
+				<dt>
+					\:
+				</dt>
+				<dd>
+					colon
+				</dd>
+				<dt>
+					\,
+				</dt>
+				<dd>
+					comma
+				</dd>
+				<dt>
+					\"
+				</dt>
+				<dd>
+					double quote
+				</dd>
+				<dt>
+					\\
+				</dt>
+				<dd>
+					backslash
+				</dd>
+				<dt>
+					\(&nbsp;&nbsp;\)
+				</dt>
+				<dd>
+					parentheses
+				</dd>
+				<dt>
+					\[&nbsp;&nbsp;\]
+				</dt>
+				<dd>
+					brackets
+				</dd>
+				<dt>
+					\{&nbsp;&nbsp;\}
+				</dt>
+				<dd>
+					curly brackets
+				</dd>
+				<dt>
+					\&lt;newline&gt;
+				</dt>
+				<dd>
+					&lt;no value&gt;
+				</dd>
+			</dl>
+			<p>
+				Note that escaped characters are only used when the escaped character has no meaning to the parser. Some tag values that require additional parsing may contain unescaped colons, brackets, quotes, etc., that have meaning in decoding the tag value. Unescaped spaces between the separator colon and the start of the value tag are discarded.
+			</p>
+			<p>
+				In practice, the OBO parser will assume that <em>any</em> character following a backslash is an escaped character. So <code>\a</code> and <code>\?</code> are legal escape sequences that translated to "a" and "?" respectively.
+			</p>
+			<p>
+				Some example tag-value pairs:
+			</p>
+			<div class="fmt">
+				<p>
+					<code> [Term]
+						<br>
+						id: GO:0019383
+						<br>
+						name: (+)-camphor catabolism
+						<br>
+						def: "The catabolism of (+)-camphor." [GO:ma "Michael \"Mike\" Ashburner was responsible for creating this term"]
+						<br>
+						comment: This is a gratuitous example\nof an escaped newline </code>
+				</p>
+			</div>
+			<h3 id="docu">Document Header Tags</h3>
+			<p>
+				The document header consists of a series of tag-value pairs. The <code>format-version</code> tag <em>must</em> be the first tag in the header. The other tags may appear in any order.
+			</p>
+			<h4 id="wreck">Required tags</h4>
+			<dl class="tableWide codeList">
+				<dt>
+					format-version
+				</dt>
+				<dd>
+					gives the version of the encoding of this flat file format. This tag allows parsers to handle a variety of different flat file formats, even if the basic structure of the flat files changes.
+				</dd>
+				<dt>
+					typeref
+				</dt>
+				<dd>
+					A url pointing to a type description document. A type description is a document in this flat file format containing relationship type definition information. Any document that contains tags requiring non-built-in relationship types (such as the "relationship" tag), must contain a typeref line. Please see "Relationship Types" below for more information.
+				</dd>
+			</dl>
+			<h4 id="opt">Optional tags</h4>
+			<dl class="tableWide codeList">
+				<dt>
+					version
+				</dt>
+				<dd>
+					The version of this particular file
+				</dd>
+				<dt>
+					date
+				</dt>
+				<dd>
+					The current date in dd:mm:yyyy hh:mm format
+				</dd>
+				<dt>
+					saved-by
+				</dt>
+				<dd>
+					The username of the person to last save this file
+				</dd>
+				<dt>
+					auto-generated-by
+				</dt>
+				<dd>
+					The program that generated this file
+				</dd>
+				<dt>
+					default-namespace
+				</dt>
+				<dd>
+					The namespace to which terms will be assigned, unless a different namespace is specified (using the <code>namespace</code> tag in a term stanza).
+				</dd>
+				<dt>
+					remark
+				</dt>
+				<dd>
+					General comments for this file
+				</dd>
+				<dt>
+					subsetdef
+				</dt>
+				<dd>
+					A description of a term subset. The value for this tag should contain a subset name, a space, and a quote enclosed subset description.
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code>subsetdef: goslim_generic "Generic GO Slim"</code>
+						</p>
+					</div>
+				</dd>
+				<dd>
+					Some optional tags may not survive round-tripping through a data adapter. See <a href="#par">Parser Requirements</a> below.
+				</dd>
+			</dl>
+			<h3 id="sta">Stanza Types</h3>
+			<p>
+				Currently, the flat file format supports two stanza types: <code>[Term]</code>, and <code>[Typedef]</code>. Unrecognized stanza types must survive round-tripping.
+			</p>
+			<h3 id="tags">Tags in a [Term] stanza</h3>
+			<p>
+				The term description section is a collection of tag-value pairs. Each term description begins with an <code>id</code> tag. The value of the <code>id</code> tag announces the term to which all the following tags in the term description refer.
+			</p>
+			<p>
+				A term description <em>does not have to be complete</em>. A term may contain multiple descriptions in a single file (or multiple descriptions in multiple files). Each description may provide additional information about a term. This makes it very simple for parsers to read in specialized or optional information (such as InterPro mappings, for example).
+			</p>
+			<p>
+				This means that parsers must wait until the end of the parse batch to check whether required information is missing. Multiple descriptions may produce parse errors if:
+			</p>
+			<ul>
+				<li>
+					A description contradicts a previous description (ie one term description gives a different term name than another description)
+				</li>
+				<li>
+					A parser has processed all the files in a batch, but a term is still missing some required value (such as a name).
+				</li>
+			</ul>
+			<h4 id="req2">Required tags</h4>
+			<dl class="tableWide codeList">
+				<dt>
+					id
+				</dt>
+				<dd>
+					The unique id of the current term. This can be any string. This tag must always be the first tag in any term description
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code> id: CAR:0000001 </code>
+						</p>
+					</div>
+				</dd>
+				<dt>
+					name
+				</dt>
+				<dd>
+					The term name. Any term may only have <strong>one</strong> name defined. If multiple term names are defined, it is a parse error.
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code> name: Volkswagen Beetle </code>
+						</p>
+					</div>
+				</dd>
+			</dl>
+			<h4 id="opt2">Optional tags</h4>
+			<dl class="tableWide codeList">
+				<dt>
+					alt_id
+				</dt>
+				<dd>
+					Defines an alternate id for this term. A term may have any number of alternate ids.
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code> alt_id: CAR:0000666 </code>
+						</p>
+					</div>
+				</dd>
+				<dt>
+					namespace
+				</dt>
+				<dd>
+					The namespace in which the term belongs. If this tag is not present, the term will be assigned to the <code>default-namespace</code> specified in the file header stanza.
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code>namespace: car_ontology</code>
+						</p>
+					</div>
+				</dd>
+				<dt>
+					def
+				</dt>
+				<dd>
+					The definition of the current term. There must be zero or one instances of this tag per term description. More than one definition for a term generates a parse error. The value of this tag should be the quote enclosed definition text, followed by a dbxref list containing dbxrefs that describe the origin of this definition (see <a href="#dbxrefformat">Dbxref Formatting</a> for information on how dbxref lists are encoded).
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code>definition: "The Volkswagen Beetle or Bug is a small family car, the best known car of Volkswagen, of Germany, and almost certainly the world. Thanks to its distinctive shape and sound, its reliability, and presumably other factors, it now enjoys a cult status." [http://en.wikipedia.org/ "Wikipedia", VW:0283 ""]</code>
+						</p>
+					</div>
+				</dd>
+				<dt>
+					comment
+				</dt>
+				<dd>
+					A comment for this term. There must be zero or one instances of this tag per term description. More than one comment for a term generates a parse error.
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code>comment: Note that this term refers to both the old and new (post-1998) Beetles.</code>
+						</p>
+					</div>
+				</dd>
+				<dt>
+					subset
+				</dt>
+				<dd>
+					This tag indicates a term subset to which this term belongs. The value of this tag must be a subset name as defined in a subsetdef tag in the file header. If the value of this tag is not mentioned in a subsetdef tag, a parse error will be generated. A term may belong to any number of subsets.
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code>subset: classic_cars</code>
+						</p>
+					</div>
+				</dd>
+				<dt>
+					synonym
+				</dt>
+				<dd>
+					This tag gives a synonym for the term; whether the synonym is exact, broad, narrow, or otherwise related to the term is not specified. The value of this tag should be the quote enclosed synonym text, followed by an optional dbxref list containing dbxrefs that describe the origin of this synonym (see <a href="#dbxrefformat">Dbxref Formatting</a> for information on how dbxref lists are encoded). A term may have any number of synonyms.
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code>synonym: "The Bug" [VEH:391840]</code>
+						</p>
+					</div>
+				</dd>
+				<dt>
+					related_synonym
+					<br>
+					exact_synonym
+					<br>
+					broad_synonym
+					<br>
+					narrow_synonym
+				</dt>
+				<dd>
+					These tags give a synonym for the term of the specified type; see the <a href="GO.ontology.structure.html#synonyms">documentation on synonyms</a> for information on synonym types. The value of the tag should be the quote enclosed synonym text, followed by an optional dbxref list containing dbxrefs that describe the origin of this synonym (see <a href="#dbxrefformat">Dbxref Formatting</a> for information on how dbxref lists are encoded). A term may have any number of related synonyms.
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code> exact_synonym: "VW Bug" [VW:0283, TPT:938VWB]
+								<br>
+								related_synonym: "Type 1" [] </code>
+						</p>
+					</div>
+				</dd>
+				<dt>
+					xref_analog
+				</dt>
+				<dd>
+					A dbxref that describes an analogous object in another vocabulary (see <a href="#dbxrefformat">Dbxref Formatting</a> for information about how the value of this tag must be formatted). A term may have any number of analogous xrefs.
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code>xref_analog: VW:0283</code>
+						</p>
+					</div>
+				</dd>
+				<dt>
+					xref_unknown
+				</dt>
+				<dd>
+					A dbxref with an unknown type (see <a href="#dbxrefformat">Dbxref Formatting</a> for information about how the value of this tag must be formatted). A term may have any number of unknown typed xrefs. This tag should not be used if possible (see <a href="#par">Parser Requirements</a> for information about how parsers may handle this tag).
+				</dd>
+				<dt>
+					is_a
+				</dt>
+				<dd>
+					This tag describes a subclassing relationship between one term and another. A term may have any number of <span class="rel">is a</span> relationships. Terms with no <span class="rel">is a</span> relationships are roots. A term with no <span class="rel">is a</span> relationships may not specify any relationship tags. To do so is a parse error.
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code>is_a: CAR:0009478</code>
+						</p>
+					</div>
+				</dd>
+				<dt>
+					relationship
+				</dt>
+				<dd>
+					This tag describes a typed relationship between this term and another term. The value of this tag should be the relationship type id, and then the id of the target term. The relationship type name must be a relationship type name as defined in a <code>typedef</code> tag stanza. The <code>typedef</code> must either occur in a document in the current parse batch, or in a file imported via a <code>typeref</code> header tag. If the relationship type name is undefined, a parse error will be generated. If the id of the target term cannot be resolved by the end of parsing the current batch of files, this tag describes a "dangling reference". See <a href="#par">Parser Requirements</a> for information about how a parser may handle dangling references. If a relationship is specified for a term with an <code>is_obsolete</code> value of true, a parse error will be generated. If a relationship target is a term which is obsolete, a parse error will be generated.
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code>relationship: part_of CAR:0009478</code>
+						</p>
+					</div>
+				</dd>
+				<dt>
+					is_obsolete
+				</dt>
+				<dd>
+					This tag indicates whether or not the term is obsolete. Allowable values are "true" and "false" (false is assumed if this tag is not present). Obsolete terms must have <strong>no</strong> <code>relationship</code> or <code>is_a</code> tags.
+				</dd>
+				<dd>
+					Example:
+					<div class="fmt">
+						<p>
+							<code>is_obsolete: true</code>
+						</p>
+					</div>
+				</dd>
+				<dt>
+					use_term
+				</dt>
+				<dd>
+					This tag indicates which term to use instead of an obsolete term. The value of this tag is the id of another term. If the tag value refers to a term that is not specified in the current load batch, it is a "dangling reference" (see <a href="#par">Parser Requirements</a>). If this tag is specified and the <code>is_obsolete</code> value for the current term is not true, a parse error will be generated. This tag is not required for terms that specify the <code>is_obsolete</code> tag, but it is recommended (some parsers may choose to issue warnings about obsolete terms that do not specify a replacement term). An obsolete term may have any number of <code>use_term</code> tags.
+				</dd>
+				<dt>
+					domain
+				</dt>
+				<dd>
+					This tag determines the children that can be assigned to relationships with this type. If the domain is set, term relationships with this type may only have children that are the same as, or subclasses of, the domain term.
+				</dd>
+				<dd>
+					<em>Note:</em> This tag is not used in GO at present, although it is available for use in OBO-formatted files for any ontology.
+				</dd>
+				<dt>
+					range
+				</dt>
+				<dd>
+					This tag specifies the parents that can be assigned to relationships with this type. If the range is set, term relationships with this type may only have parents that are the same as, or subclasses of, the range term.
+				</dd>
+				<dd>
+					<em>Note:</em> This tag is not used in GO at present, although it is available for use in OBO-formatted files for any ontology.
+				</dd>
+				<dt>
+					is_cyclic
+				</dt>
+				<dd>
+					This tag indicates that it is legal to create cycles out of this relationship.
+				</dd>
+				<dd>
+					<em>Note:</em> This tag is not used in GO at present, although it is available for use in OBO-formatted files for any ontology.
+				</dd>
+				<dt>
+					is_transitive
+				</dt>
+				<dd>
+					This tag indicates that the relationship is marked as transitive. This information is very useful to reasoners and other automatic traversals of the graph.
+				</dd>
+				<dd>
+					<em>Note:</em> This tag is not used in GO at present, although it is available for use in OBO-formatted files for any ontology.
+				</dd>
+				<dt>
+					is_symmetric
+				</dt>
+				<dd>
+					This tag indicates that the relationship is marked as symmetric (meaning that if the relationship holds from the child to parent, it also holds from parent to child). This information is very useful to reasoners and other automatic traversals of the graph.
+				</dd>
+				<dd>
+					<em>Note:</em> This tag is not used in GO at present, although it is available for use in OBO-formatted files for any ontology.
+				</dd>
+			</dl>
+			<h3 id="dbxrefformat">Dbxref Formatting</h3>
+			<p>
+				Dbxref definitions take the following form:
+			</p>
+			<div class="fmt">
+				<p>
+					<code>&lt;dbxref name&gt;</code>
+				</p>
+			</div>
+			<p>
+				or
+			</p>
+			<div class="fmt">
+				<p>
+					<code>&lt;dbxref name&gt; "&lt;dbxref description&gt;"</code>
+				</p>
+			</div>
+			<p>
+				By convention, the dbxref name is a colon separated key-value pair, but this is not a requirement. If provided, the dbxref description is a string of zero or more characters describing the dbxref. An example of a dbxref would be:
+			</p>
+			<div class="fmt">
+				<p>
+					<code>GO:ma "Term written by Michael\, without reference to other sources"</code>
+				</p>
+			</div>
+			<p>
+				Dbxref lists are used when a tag value must contain several dbxrefs. Dbxref lists take the following form:
+			</p>
+			<div class="fmt">
+				<p>
+					<code>[&lt;dbxref definition&gt;, &lt;dbxref definition&gt;, ...]</code>
+				</p>
+			</div>
+			<p>
+				The brackets may contain zero or more comma separated dbxref definitions. An example of a dbxref list would be:
+			</p>
+			<div class="fmt">
+				<p>
+					<code>[GO:ma, GO:mah "Midori created this term"]</code>
+				</p>
+			</div>
+			<h3 id="type">Tags in [Typedef] Stanza</h3>
+			<p>
+				[Typedef] stanzas support all the same tags as a [Term] stanza. They just describe different classes of objects.
+			</p>
+			<p class="toTop">
+				<a href="#top" title="Back to the top of the page">Back to top</a>
+			</p>
+		</div>
+		<div class="block">
+			<h2 id="par">Parser Requirements</h2>
+			<p>
+				This section of the document attempts to establish guidelines for parser behavior. By establishing guidelines, we can ensure some consistency in operation between parsers.
+			</p>
+			<h3 id="gen">General behavior</h3>
+			<p>
+				All parsers should be capable of failing gracefully and generating errors explaining the failure. Parsers may optionally be capable of generating warnings, if the file being read contains non-fatal errors.
+			</p>
+			<h3 id="lin">Line parsing errors</h3>
+			<p>
+				All parsers should be able to detect various types of line parsing errors:
+			</p>
+			<ul>
+				<li>
+					<samp>"Cannot find key-terminating colon"</samp>: A line does not contain a colon to indicate the end of the tag name.
+				</li>
+				<li>
+					<samp>"Tag has no value"</samp>: There is no value to the right of the key tag colon.
+				</li>
+				<li>
+					<samp>"Unrecognized escape character"</samp>: An unrecognized escape sequence has been used.
+				</li>
+				<li>
+					<samp>"Unexpected end of line"</samp>: More data was expected, but the input line ended.
+				</li>
+				<li>
+					<samp>"Expected quoted string"</samp>: A quoted string was expected, but something else was found.
+				</li>
+				<li>
+					<samp>"Unclosed quoted string"</samp>: A quoted string was found in an appropriate place, but no closing quote was encountered.
+				</li>
+				<li>
+					<samp>"Expected dbxref list"</samp>: A dbxref list was expected, but something else was found.
+				</li>
+				<li>
+					<samp>"Malformed dbxref list"</samp>: A dbxref list was found in an appropriate place, but it was not well formed.
+				</li>
+				<li>
+					<samp>"Unclosed dbxref list"</samp>: A dbxref list was found in an appropriate place, but no closing bracket was found
+				</li>
+			</ul>
+			<h3 id="com">! Comments</h3>
+			<p>
+				A file may contain any number of lines beginning with <code>!</code>, at any point in the file. These lines may be ignored by a parser, or may be read and stored. Parsers are <em>not</em> required to support the round-tripping of <code>!</code> comments; they may be entirely discarded.
+			</p>
+			<h3 id="unr">Unrecognized tags</h3>
+			<p>
+				A parser may do one of three things when an unrecognized tag is found:
+			</p>
+			<ul>
+				<li>
+					<samp>FAIL</samp>: Report a fatal error and terminate parsing.
+				</li>
+				<li>
+					<samp>WARN</samp>: Report a warning, but continue parsing and ignore the unrecognized tag <em>(recommended)</em>.
+				</li>
+				<li>
+					<samp>IGNORE</samp>: Silently ignore the unrecognized tag.
+				</li>
+			</ul>
+			<h3 id="hed">Optional header tags</h3>
+			<p>
+				Optional header tags need not survive round-tripping. Parsers may choose to preserve the values of these tags, or may choose to ignore these values when reading, but generate their own values when writing a file.
+			</p>
+			<h3 id="unk">Dbxrefs with unknown types</h3>
+			<p>
+				Unknown dbxrefs can be handled in one of three ways:
+			</p>
+			<ul>
+				<li>
+					<samp>FAIL</samp>: Report a fatal error and terminate parsing.
+				</li>
+				<li>
+					<samp>WARN</samp>: Report a warning, but continue parsing and read the untyped dbxref <em>(recommended)</em>.
+				</li>
+				<li>
+					<samp>IGNORE</samp>: Silently read the unknown dbxref.
+				</li>
+			</ul>
+			<h3 id="dang">Dangling references</h3>
+			<p>
+				There are several options when a dangling reference is encountered
+			</p>
+			<ul>
+				<li>
+					<samp>FAIL</samp>: Report a fatal error and terminate parsing.
+				</li>
+				<li>
+					<samp>WARN_AND_IGNORE</samp>: Report a fatal error and ignore the dangling reference.
+				</li>
+				<li>
+					<samp>WARN_AND_READ</samp>: Report a warning and read in the dangling reference, storing it in a form suitable for round-tripping.
+				</li>
+				<li>
+					<samp>READ</samp>: Silently read the dangling relationship <em>(recommended)</em>.
+				</li>
+			</ul>
+			<h3 id="graf">Graph Structure</h3>
+			<p>
+				Unlike the deprecated GO flat file format, this flat file format does not describe a rooted, directed acyclic graph. This flat file format describes unrooted, possibly cyclic, directed graphs.
+			</p>
+			<p>
+				Parsers that read this flat file format must be capable of handling the possibility of a cyclic structure <strong>and</strong> the existence of multiple roots (or no roots at all, in some cyclic graphs).
+			</p>
+			<p>
+				Some tools require a single root for any graph they manipulate. Such tools may connect multiple roots to a single dummy root node. However, these tools <strong>must not</strong> output this dummy root when reserializing a graph.
+			</p>
+			<h3 id="desk">Dbxref descriptions</h3>
+			<p>
+				The same dbxref may occur several times with different descriptions. It is up to the parser to determine the semantics of this situation. The parser may treat these as separate dbxrefs, with different descriptions in different contexts. Alternatively, the parser may treat these as references to a <em>single</em> dbxref. In that case, it is up to the parser to decide how to treat multiple descriptions (it is recommended that the parser issue a warning).
+			</p>
+			<h3 id="cereal">Serializer Conventions</h3>
+			<p>
+				Any parser should be able to read correctly formatted files in any layout. However, it is suggested that serializers obey the following conventions to ensure consistency.
+			</p>
+			<h3 id="startrek">General conventions</h3>
+			<ol>
+				<li>
+					Within a single file, all tags relating to a single entity should appear in the same stanza (thereby minimizing the total number of stanzas and keeping all tags regarding a single entity in the same place)
+				</li>
+				<li>
+					All tags not specified in this document should appear after the the tags that are described above, and should be ordered alphabetically, first on the tag name, then on the tag value. If there are two or more tags with the same name (whether described in this document or not), they should be ordered alphabetically on the tag value.
+				</li>
+			</ol>
+			<h3 id="more">Stanza conventions</h3>
+			<p>
+				All new stanza declarations should be preceded by a blank line. <em>All</em> stanzas of <em>any</em> type are ordered alphabetically by <code>id</code> (this is to ensure CVS compatibility).
+			</p>
+			<h3 id="dere">Header tags</h3>
+			<p>
+				Header tags should appear in the following order:
+			</p>
+<ol class="dot codeList">
+					<li>
+						format-version
+					</li>
+					<li>
+						version
+					</li>
+					<li>
+						date
+					</li>
+					<li>
+						saved-by
+					</li>
+					<li>
+						auto-generated-by
+					</li>
+					<li>
+						typeref
+					</li>
+					<li>
+						subsetdef
+					</li>
+					<li>
+						remark
+					</li>
+				</ol>
+			<h3 id="stan">Ordering Term and Typedef stanzas</h3>
+			<p>
+				Term and Typdef stanzas should be serialized in alphabetical order on the value of their <code>id</code> tag.
+			</p>
+			<h3 id="typedef">Term and Typedef tags</h3>
+			<p>
+				Term and typedef tags should appear in the following order:
+			</p>
+<ol class="dot codeList">
+					<li>
+						id
+					</li>
+					<li>
+						name
+					</li>
+					<li>
+						alt_id
+					</li>
+					<li>
+						namespace
+					</li>
+					<li>
+						def
+					</li>
+					<li>
+						comment
+					</li>
+					<li>
+						subset
+					</li>
+					<li>
+						synonym
+					</li>
+					<li>
+						related_synonym
+					</li>
+					<li>
+						exact_synonym
+					</li>
+					<li>
+						narrow_synonym
+					</li>
+					<li>
+						broad_synonym
+					</li>
+					<li>
+						xref_analog
+					</li>
+					<li>
+						xref_unknown
+					</li>
+					<li>
+						is_a
+					</li>
+					<li>
+						relationship
+					</li>
+					<li>
+						is_obsolete
+					</li>
+					<li>
+						use_term
+					</li>
+					<li>
+						domain
+					</li>
+					<li>
+						range
+					</li>
+					<li>
+						is_cyclic
+					</li>
+					<li>
+						is_transitive
+					</li>
+					<li>
+						is_symmetric
+					</li>
+					<li>
+						&lt;any unknown properties&gt;
+					</li>
+				</ol>
+			<p>
+				<code>Relationship</code> tags should be ordered alphabetically on type name, then target id.
+			</p>
+			<h3 id="list">Dbxref lists</h3>
+			<p>
+				Values in dbxref lists should be ordered alphabetically on the dbxref name.
+			</p>
+			<p class="toTop">
+				<a href="#top" title="Back to the top of the page">Back to top</a>
+			</p>
+		</div>
+		<div class="block">
+			<h2 id="eg">An example file</h2>
+			<p>
+				The following is a simple example file showing a very small subset of the function ontology.
+			</p>
+			<div class="fmt">
+				<p>
+					<code> format-version: GO_1.0
+						<br>
+						!any comment here
+						<br>
+						typeref: relationship.types
+						<br>
+						subsetdef: goslim "Generic GO Slim"
+						<br>
+						version: $Revision: 1.18 $
+						<br>
+						date: April 18th, 2003
+						<br>
+						saved-by: jrichter
+						<br>
+						remark: Example file
+						<br>
+						<br>
+						[Term]
+						<br>
+						id: GO:0003674
+						<br>
+						name: molecular_function
+						<br>
+						def: "The action characteristic of a gene product." [GO:curators]
+						<br>
+						subset: goslim
+						<br>
+						<br>
+						[Term]
+						<br>
+						id: GO:0016209
+						<br>
+						name: antioxidant activity
+						<br>
+						is_a: GO:0003674
+						<br>
+						def: "Inhibition of the reactions brought about by dioxygen or peroxides. Usually the antioxidant is effective because it can itself be more easily oxidized than the substance protected. The term is often applied to components that can trap free radicals, thereby breaking the chain reaction that normally leads to extensive biological damage." [ISBN:0198506732]
+						<br>
+						<br>
+						[Term]
+						<br>
+						id: GO:0045174
+						<br>
+						name: glutathione dehydrogenase (ascorbate) activity
+						<br>
+						xref_analog: EC:1.8.5.1 ""
+						<br>
+						def: "Catalysis of the reaction: 2 glutathione + dehydroascorbate = glutathione disulfide + ascorbate." [EC:1.8.5.1]
+						<br>
+						synonym: dehydroascorbate reductase []
+						<br>
+						is_a: GO:0009055
+						<br>
+						is_a: GO:0015038
+						<br>
+						is_a: GO:0016672 </code>
+				</p>
+			</div>
+			<p class="toTop">
+				<a href="#top" title="Back to the top of the page">Back to top</a>
+			</p>
+		</div>
+	</div>
+</div>
+</body>
+</html>

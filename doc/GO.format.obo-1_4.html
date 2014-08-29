@@ -1,0 +1,2313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+        <link href="owl.css" rel="stylesheet" type="text/css" />
+        <link href="wg.css" rel="stylesheet" type="text/css" />
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>The OBO Flat File Format Guide, version 1.4</title> 
+<!--#include file="page-head.html" -->
+</head>
+<body>
+<!--#include file="header.html" -->
+<div id="wrapper">
+<!-- page content starts here -->
+	<div id="main">
+		<h1>The OBO Flat File Format Guide, version&nbsp;1.4</h1> 
+		<p>
+			<span id="author">Chris Mungall</span> 
+			<br>
+			<span id="author">Amelia Ireland</span> 
+			<br>
+		</p>
+		<p>
+			<strong>DRAFT</strong> 
+		</p>
+		<p>
+			OBO format is the text file format used by <a rel="external" href="http://www.oboedit.org">OBO-Edit</a>, the open source, platform-independent application for viewing and editing ontologies.
+		</p>
+		<p>
+			This document is intended as a companion guide
+			to the OBO-Format, in the style of
+			the <a href="GO.format.obo-1_2.html">OBO 1.2
+			file format guide</a>. It is not intended as a
+			<i>formal</i> specification of syntax or
+			semantics - this is available as a seperate
+			document, the
+			OBO Format Syntax and Semantics available at
+			<a href="http://purl.obolibrary.org/obo/oboformat/spec.html">http://purl.obolibrary.org/obo/oboformat/spec.html</a>
+          document. <b>The formal specification is
+            normative, this document is only a guide</b>.
+        </p>
+        <p>
+          The official website for OBO Format documentation and
+          software is <a href="http://purl.obolibrary.org/obo/oboformat/">http://purl.obolibrary.org/obo/oboformat/</a>
+        </p>
+                <p>
+                  This document supersedes the obsolete 1.3
+                  specification. Syntactic changes are minimal.
+                </p>
+		<div class="new">
+		<p>
+			Any changes between OBO-Format 1.2 and 1.4 are
+			either in <span class="new_txt">highlighted
+			text</span>, or with a coloured bar at the
+			left side of the page.
+                        See <a href="#S.4">further on in this
+			document</a> for a summary of these changes.
+		</p>
+		</div>
+		<div id="navPage">
+			<ul>
+				<li class="h2">
+					<a href="#S.0">Abstract</a> 
+				</li>
+				<li class="h2">
+					<a href="#S.1">OBO Format Syntactic Structure</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.1.1">OBO Document Structure</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.1.2">Comments</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.1.4">Tag-Value Pairs</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.1.4">Trailing Modifiers</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.1.5">Escape characters</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.1.6">ID Syntax</a> 
+				</li>
+				<li class="h2">
+					<a href="#S.2">Built-in OBO Semantics</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.2.1">Document Header Tags</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.2.2">Stanzas</a> 
+				</li>
+				<li class="h2">
+					<a href="#S.3">Parsers and Serializers</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.3.1">General Behavior</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.3.2">Handling Unrecognized Tags</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.3.3">Non-Roundtripping Header Tags</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.3.4">Dangling References</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.3.5">Serializer Conventions</a> 
+				</li>
+				<li class="h2">
+					<a href="#S.4">Changes in version 1.4</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.4.1">Changes that break forwards compatibility</a> 
+				</li>
+				<li class="h3">
+					<a href="#S.4.2">Forwards compatible changes</a> 
+				</li>
+			</ul>
+		</div>
+		<div class="block">
+			<h2 id="S.0">Abstract</h2> 
+			<p>
+				The OBO flat file format is for representing ontologies and controlled vocabularies. 
+			</p>
+			<p>
+				The format itself attempts to achieve the following goals: 
+			</p>
+			<ul class="dot">
+				<li>
+					Human readability 
+				</li>
+				<li>
+					Ease of parsing 
+				</li>
+				<li>
+					Extensibility 
+				</li>
+				<li>
+					Minimal redundancy 
+				</li>
+			</ul>
+			<p class="toTop">
+				<a href="#top" title="Back to the top of the page">Back to top</a> 
+			</p>
+		</div>
+		<div class="block">
+			<h2 id="S.1">OBO Format Syntactic Structure</h2> 
+			<p>
+				The format is similar to the tag-value format of the GO definitions file, with a few modifications. One important difference is that <em>unrecognized tags in any context do not necessarily generate fatal errors</em> (although some parsers may decide to do so; see <a href="#S.2">Parser Requirements</a> below). This allows parsers to read files that contain information not used by a particular tool. 
+			</p>
+			<h3 id="S.1.1">OBO Document Structure</h3> 
+			<p>
+				An OBO document is structured as follows: 
+			</p>
+			<div class="fmt">
+				<p>
+					<code> &lt;header&gt; 
+						<br>
+						<br>
+						&lt;stanza&gt; 
+						<br>
+						&lt;stanza&gt; 
+						<br>
+						... </code> 
+				</p>
+			</div>
+			<p>
+				Blank lines are ignored. 
+			</p>
+			<p>
+				The header is an unlabeled section at the beginning of the document containing <a href="#S.1.4">tag-value pairs</a>. The header ends when the first stanza is encountered. 
+			</p>
+			<p>
+				A stanza is a labeled section of the document, indicating that an object of a particular type is being described. Stanzas consist of a stanza name in square brackets, and a series of <a href="#S.1.4">tag-value pairs</a>, structured as follows: 
+			</p>
+			<div class="fmt">
+				<p>
+					<code> [&lt;Stanza name&gt;] 
+						<br>
+						&lt;tag-value pair&gt; 
+						<br>
+						&lt;tag-value pair&gt; 
+						<br>
+						&lt;tag-value pair&gt; </code> 
+				</p>
+			</div>
+			<h3 id="S.1.2">Comments</h3> 
+			<p>
+				An OBO file may contain any number of lines beginning with <code>!</code>, at any point in the file. These lines are ignored by parsers. 
+			</p>
+			<p>
+				Further, any line may end with a <code>!</code> comment. Parsers that encounter an unescaped <code>!</code> will ignore the <code>!</code> and all data until the end of the line. <code>\&lt;newline&gt;</code> sequences are not allowed in <code>!</code> comments (see <a href="#S.1.5">escape characters</a>). 
+			</p>
+			<h3 id="S.1.4">Tag-Value Pairs</h3> 
+			<p>
+				Tag-value pairs consist of a tag name, an unescaped colon, the tag value, and a newline: 
+			</p>
+			<div class="fmt">
+				<p>
+					<code> &lt;tag&gt;: &lt;value&gt; {&lt;trailing modifiers&gt;} ! &lt;comment&gt; </code> 
+				</p>
+			</div>
+			<p>
+				The tag name is always a string. The value is always a string, but the value string may require special parsing depending on the tag with which it is associated. 
+			</p>
+			<p>
+				In general, tag-value pairs occur on a single line. Multi-line values are possible using escape characters (see <a href="#S.1.5">escape characters</a>). 
+			</p>
+			<p>
+				In general, each stanza type expects a particular set of pre-defined tags. However, a stanza may contain <em>any</em> tag. If a parser does not recognize a tag name for a particular stanza, no error will be generated. This allows new experimental tags to be added without breaking existing parsers. See <a href="#S.3.2">handling unrecognized tags</a> for specifics. 
+			</p>
+			<h3 id="S.1.4">Trailing Modifiers</h3> 
+			<p>
+				Any tag-value pair may be followed by a trailing modifier. Trailing modifiers have been introduced into the OBO 1.2 Specification to allow the graceful addition of new features to existing tags. 
+			</p>
+			<p>
+				A trailing modifier has the following structure: 
+			</p>
+			<div class="fmt">
+				<p>
+					<code> {&lt;name&gt;=&lt;value&gt;, &lt;name=value&gt;, &lt;name=value&gt;} </code> 
+				</p>
+			</div>
+			<p>
+				That is, trailing modifiers are lists of name-value pairs. 
+			</p>
+			<p>
+				Parser implementations may choose to decode and/or round-trip these trailing modifiers. However, this is <strong>not</strong> required. A parser may choose to ignore or strip away trailing modifiers. 
+			</p>
+			<p>
+				For this reason, trailing modifiers should only include information that is optional or experimental. 
+			</p>
+			<p>
+				Trailing modifiers may also occur within dbxref definitions (see <a href="#S.2.2.3">dbxref formatting</a>). 
+			</p>
+			<h3 id="S.1.5">Escape characters</h3> 
+			<div class="new">
+                          note: this section needs to be brought in line with the formal spec.
+                        </div>
+			<p>
+				Tag names and values may contain the following escape characters: 
+			</p>
+			<dl class="tableMid codeList">
+				<dt>
+					\n 
+				</dt>
+				<dd>
+					newline 
+				</dd>
+				<dt>
+					\W 
+				</dt>
+				<dd>
+					single space 
+				</dd>
+				<dt>
+					\t 
+				</dt>
+				<dd>
+					tab 
+				</dd>
+				<dt>
+					\: 
+				</dt>
+				<dd>
+					colon 
+				</dd>
+				<dt>
+					\, 
+				</dt>
+				<dd>
+					comma 
+				</dd>
+				<dt>
+					\&quot; 
+				</dt>
+				<dd>
+					double quote 
+				</dd>
+				<dt>
+					\\ 
+				</dt>
+				<dd>
+					backslash 
+				</dd>
+				<dt>
+					\( 
+				</dt>
+				<dd>
+					open parenthesis 
+				</dd>
+				<dt>
+					\) 
+				</dt>
+				<dd>
+					close parenthesis 
+				</dd>
+				<dt>
+					\[ 
+				</dt>
+				<dd>
+					open bracket 
+				</dd>
+				<dt>
+					\] 
+				</dt>
+				<dd>
+					close bracket 
+				</dd>
+				<dt>
+					\{ 
+				</dt>
+				<dd>
+					open brace 
+				</dd>
+				<dt>
+					\} 
+				</dt>
+				<dd>
+					close brace 
+				</dd>
+				<dt>
+					@ 
+				</dt>
+				<dd>
+					at (language tag) 
+				</dd>
+				<dt>
+					\&lt;newline&gt; 
+				</dt>
+				<dd>
+					&lt;no value&gt; 
+				</dd>
+			</dl>
+			<p>
+				Escaped characters should only be used when a literal character is needed (that is, a character that the parser should not interpret as having a special meaning when parsing). Some tag values may contain unescaped colons, brackets, quotes, etc., that have meaning in decoding the tag value. Unescaped spaces between the separator colon and the start of the value tag are discarded. 
+			</p>
+			<p>
+				OBO parser implementations may support only these escape characters, or they may assume that <em>any</em> character following a backslash is an escaped character. Parsers that choose the latter approach will translate <code>\a</code> and <code>\?</code> to "a" and "?" respectively. 
+			</p>
+			<div class="new">
+				<h3 id="S.1.6">Identifier Syntax</h3> 
+				<p>
+					Identifiers (IDs) in OBO should be strings consisting of an IDSpace concatenated to a LocalID via a <strong>:</strong> (colon) character. The ID should not contain any whitespace. The IDSpace should not itself contain any colon characters, and should ideally be registered on the <a href="http://www.geneontology.org/cgi-bin/xrefs.cgi">GO xrefs page</a> or with <a href="http://obofoundry.org/">OBO</a>. 
+				</p>
+			</div>
+			<p class="toTop">
+				<a href="#top" title="Back to the top of the page">Back to top</a> 
+			</p>
+		</div>
+		<div class="block">
+			<h2 id="S.2">Built-in OBO Semantics</h2><h3 id="S.2.1">Document Header Tags</h3><h4>Required tags</h4> 
+			<dl class="tableWide codeList">
+				<dt>
+					format-version 
+				</dt>
+				<dd>
+					Gives the OBO specification
+					version that this file
+					uses. This is useful if tag
+					semantics change from one OBO
+					specification version to the
+					next. Cardinality: <strong>zero or one</strong>.
+				</dd>
+			</dl>
+			<h4>Optional tags</h4> 
+			<dl class="tableWide codeList">
+				<dt>
+					data-version 
+				</dt>
+				<dd>
+					Gives the version of the
+					current ontology. This gets
+					translated to versionIRI in
+					OWL. Cardinality: <strong>zero
+					or one</strong>.
+				</dd>
+				<dt>
+					version 
+				</dt>
+				<dd>
+					Deprecated. Use <code>data-version</code> instead. 
+				</dd>
+				<dt>
+					ontology
+				</dt>
+				<dd>
+				  The ID space of this
+				  ontology. This <strong>should</strong>
+				  correspond to to the ID prefix of
+				  the terms that belong to that
+				  ontology, translated to
+				  lowercase. For GO, the value of this
+				  field will be "go". For the cell
+				  ontology (i.e. the ontology that
+				  contains CL:0000001), the value will
+				  be "cl". If the obo document
+				  contains some alternative cut or
+				  extension of the ontology (for
+				  example, a GO slim, or an ontology
+				  merged with another), then the
+				  ontology <strong>should</strong> be
+				  of form "X/Y", where X is the basic
+				  ontology name, and Y identifies the
+				  cut. For example go/gosubset_prok. A
+				  URI is also permitted in here. In
+				  the translation to OWL, the usual
+				  default prefix rules will apply,
+				  with the ".owl" suffix. E.g. "go"
+				  will be treated as
+				  "http://purl.obo-library.org/obo/go.owl"
+				</dd>
+				<dt>
+					date 
+				</dt>
+				<dd>
+					The current date in dd:MM:yyyy
+					HH:mm format (note: for
+					historic reasons, this is NOT
+					a ISO 8601 date, as is the
+					case for the creation-date
+					field)
+					. Cardinality: <strong>zero or
+					one</strong>.
+				</dd>
+				<dt>
+					saved-by 
+				</dt>
+				<dd>
+					The username of the person to last save this file. The meaning of "username" is entirely up to the application that generated the file. Cardinality: <strong>zero or one</strong>.
+				</dd>
+				<dt>
+					auto-generated-by 
+				</dt>
+				<dd>
+					The program that generated the file. Cardinality: <strong>zero or one</strong>.
+				</dd>
+				<dt>
+					subsetdef 
+				</dt>
+				<dd>
+					A description of a term subset. The value for this tag should contain a subset name, a space, and a quote enclosed subset description, as follows: 
+					<div class="fmt">
+						<p>
+							<code> subsetdef: GO_SLIM "GO Slim" </code> 
+						</p>
+					</div>
+                                        Cardinality: <strong>any</strong>.
+				</dd>
+				<dt>
+					import 
+				</dt>
+				<dd>
+					A url or ontology ID
+					referencing another OBO
+					document. <div class="new">Previously
+					this was interpreted as a
+					directive to download and
+					merge the referenced
+					file. This is no longer the
+					case. The semantics are now
+					identical to OntologyImports
+					in OWL.</new>. Parsers must
+					translate simple ontology IDs
+					(e.g. "go") to full URIs using
+					the same expansion as for the
+					ontology header tag
+					(e.g. http://purl.obolibrary.org/obo/go.owl). Parsers
+					may use different mechanisms
+					for resolving the URL. For
+					example, they may use a
+					catalog.xml file. The imported
+					document MUST be in either obo
+					format or an OWL concrete syntax.
+					Cardinality: <strong>any</strong>.
+
+				</dd>
+				<dt>
+					synonymtypedef 
+				</dt>
+				<dd>
+					A description of a user-defined synonym type. The value for this tag should contain a synonym type name, a space, a quote enclosed description, and an optional scope specifier, as follows: 
+					<div class="fmt">
+						<p>
+							<code> synonymtypedef: UK_SPELLING "British spelling" EXACT </code> 
+						</p>
+					</div>
+					<p>
+						The scope specifier indicates the default scope for any synonym that has this type. See the synonym section of <a href="#S.2.2.2">tags in a term stanza</a> for more information on the scope specifier.                                         Cardinality: <strong>any</strong>.
+
+					</p>
+				</dd>
+				<dt>
+					idspace 
+				</dt>
+				<dd>
+					A mapping between a "local" ID space and a "global" ID space. The value for this tag should be a local idspace, a space, a URI, optionally followed by a quote-enclosed description, like this: 
+					<div class="fmt">
+						<p>
+							<code> idspace: GO urn:lsid:bioontology.org:GO: "gene ontology terms" </code> 
+						</p>
+					</div>
+                                        Cardinality: <strong>any</strong>.
+
+				</dd>
+				<dt>
+					default-relationship-id-prefix 
+				</dt>
+				<dd>
+					Any relationship lacking an ID space will be prefixed with the value of this tag. For example: 
+					<div class="fmt">
+						<p>
+							<code> default-relationship-id-prefix: OBO_REL </code> 
+						</p>
+					</div>
+					<p>
+						The above will make sure that all relations referred to in the current file come from the OBO relations ontology, unless otherwise specified. 
+					</p>
+					<p>
+						The scope of this tag is within the current file only. See also <code>id-mapping</code>, below 
+					</p>
+                                        Cardinality: <strong>zero or one</strong>.
+				</dd>
+				<dt>
+					id-mapping 
+				</dt>
+				<dd>
+					Maps a Term or Typedef ID to another Term or Typedef ID. The main reason for this tag is to increase interoperability between different OBO ontologies. 
+					<div class="fmt">
+						<p>
+							<code> id-mapping: part_of OBO_REL:part_of </code> 
+						</p>
+					</div>
+					<p>
+						This maps all cases of the unqualified relationship <code>part_of</code> to the ID <code>OBO_REL:part_of</code> defined in the OBO relations ontology 
+					</p>
+					<p>
+						The scope of this tag is within the current file only. Note that the <code>default-relationship-id-prefix</code> tag takes precedence over this tag 
+					</p>
+                                        Cardinality: <strong>any</strong>
+				</dd>
+				<dt>
+					remark 
+				</dt>
+				<dd>
+					General comments for this file. This tag is differentiated from a <code>!</code> comment in that the contents of a <code>remark</code> tag are guaranteed to be preserved by a parser.                                         Cardinality: <strong>any</strong>
+
+				</dd>
+			</dl>
+			<p>
+				The following tags are new in OBO 1.4: 
+			</p>
+			<div class="new">
+				<dl class="tableWide codeList">
+					<dt>
+						treat-xrefs-as-equivalent 
+					</dt>
+					<dd>
+						The value for this tag should contain an ID Space. Ideally one declared <a href="http://www.geneontology.org/cgi-bin/xrefs.cgi">here</a> 
+						<p>
+							Macro. Treats all xrefs coming from a particular ID-Space as being statements of exact equivalence. Normally, xrefs have no special meaning beyond "This xref is of relevance to the current entity". 
+						</p>
+						<p>
+							Example: 
+						</p>
+						<div class="fmt">
+							<p>
+								<code> treat-xrefs-as-equivalent: CL 
+									<br>
+									. 
+									<br>
+									. 
+									<br>
+									. 
+									<br>
+									[Term] 
+									<br>
+									id: GO:0005623 
+									<br>
+									name: cell 
+									<br>
+									xref: CL:0000000 </code> 
+							</p>
+						</div>
+						<p>
+							This declares CL:0000000 and GO:0005623 to be equivalent in what they reference. 
+						</p>
+                                                Cardinality: <strong>any</strong>
+
+					</dd>
+					<dt>
+						treat-xrefs-as-genus-differentia 
+					</dt>
+					<dd>
+						The value for this tag should contain an ID Space followed by a relation and then a class filler.                                                 Cardinality: <strong>any</strong>.
+
+						<p>
+							Macro. Treats all xrefs coming from a particular ID-Space as being genus-differentia definitions (cross products, logical definitions, intersection definitions). Normally, xrefs have no special meaning beyond "This xref is of relevance to the current entity". 
+						</p>
+						<p>
+							Example: 
+						</p>
+						<div class="fmt">
+							<p>
+								<code> treat-xrefs-as-genus-differentia: CL part_of NCBITaxon:7955 
+									<br>
+									. 
+									<br>
+									. 
+									<br>
+									[Term] 
+									<br>
+									id: ZFA:0000134 
+									<br>
+									name: neuron 
+									<br>
+									xref: ZFIN:ZDB-ANAT-010921-563 
+									<br>
+									xref: CL:0000540 
+									<br>
+								</code> 
+							</p>
+						</div>
+						<p>
+							is treated as if it states: 
+						</p>
+						<div class="fmt">
+							<p>
+								<code> [Term] 
+									<br>
+									id: ZFA:0000134 
+									<br>
+									name: neuron 
+									<br>
+									xref: ZFIN:ZDB-ANAT-010921-563 
+									<br>
+									intersection_of: CL:0000540 
+									<br>
+									intersection_of: part_of NCBITaxon:7955 </code> 
+							</p>
+						</div>
+					</dd>
+					<dt>
+						treat-xrefs-as-relationship 
+					</dt>
+					<dd>
+						The value for this tag should contain an ID Space followed by a relation ID.                                                 Cardinality: <strong>any</strong>
+
+						<p>
+							Macro. Treats all xrefs coming from a particular ID-Space as being relationships. Normally, xrefs have no special meaning beyond "This xref is of relevance to the current entity". 
+						</p>
+						<p>
+							Example: 
+						</p>
+						<div class="fmt">
+							<p>
+								<code> treat-xrefs-as-relationship: MA homologous_to </code> 
+							</p>
+						</div>
+						<p>
+							This declares all xrefs to MA to be homology relationships. 
+						</p>
+					</dd>
+					<dt>
+						treat-xrefs-as-is_a 
+					</dt>
+					<dd>
+						The value for this tag
+						should contain an ID
+						Space.                                                 Cardinality: <strong>any</strong>
+
+						<p>
+							Macro. Treats all xrefs coming from a particular ID-Space as being is_a relationships. Normally, xrefs have no special meaning beyond "This xref is of relevance to the current entity". 
+						</p>
+						<p>
+							Example: 
+						</p>
+						<div class="fmt">
+							<p>
+								<code> treat-xrefs-as-is_a: CL </code> 
+							</p>
+						</div>
+						<p>
+							This declares all xrefs to CL to be is_a relations. 
+						</p>
+					</dd>
+					<dt>
+						relax-unique-identifier-assumption-for-namespace 
+					</dt>
+					<dd>
+						The value for this tag should be a namespace 
+						<p>
+							By default, an obo namespace (note: not ID-space) partitions all the entities such that no two entities belonging to the same namespace may be equivalent. This header tag relaxes this assumption. 
+						</p>
+						<p>
+							Note that this assumption does not hold by default *between* namespaces (it is OK for cellular_component and cell to use different identifiers to denote the type "cell"). 
+						</p>
+						<p>
+							It is unlikely that this tag will be used frequently. One scenario in which it may be useful is if a single ontology is created from multiple sources, with redundancy: 
+						</p>
+						<div class="fmt">
+							<p>
+								<code> relax-unique-identifier-assumption-for-namespace: my_combined_ontology </code> 
+							</p>
+						</div>
+                                                Cardinality: <strong>any</strong>
+
+					</dd>
+					<dt>
+						relax-unique-label-assumption-for-namespace 
+					</dt>
+					<dd>
+						The value for this tag should be a namespace 
+						<p>
+							By default, an obo namespace (note: not ID-space) partitions all the entities such that no two entities belonging to the same namespace may have the same name tag (obsolete entities omitted). This header tag relaxes this assumption. 
+						</p>
+						<p>
+							Note that this assumption does not hold by default *between* namespaces (it is OK for mouse_anatomy and fma to use the same names). 
+						</p>
+						<p>
+							It is recommended that the unique label assumption should be maintained at all times. However, there may be times at an early stage of ontology development where this is relaxed. 
+						</p>
+						<div class="fmt">
+							<p>
+								<code> relax-unique-label-assumption-for-namespace: my_combined_ontology </code> 
+							</p>
+						</div>
+                                                Cardinality: <strong>any</strong>
+					</dd>
+				</dl>
+			</div>
+			<h3 id="S.2.2">Stanzas</h3> 
+			<p>
+				At present, all Term, Typedef and Instance stanzas always begin with an <code>id</code> tag. The value of the <code>id</code> tag announces the object to which the rest of the tags in the stanza refer. Normal, non-anonymous <code>id</code>s have global scope. An object has the same <code>id</code> in every file, and in every namespace. See <a href="#S.1.6">ID Syntax</a>. 
+			</p>
+			<p>
+				The <code>id</code> tag may be optionally followed by an <code>is_anonymous</code> tag. If the value of <code>is_anonymous</code> is true, the object is anonymous. The <code>id</code> of an anonymous object is not fixed; if the ontology is parsed and then reserialized, the <code>id</code> may change. Anonymous <code>id</code>s have local scope; they are only valid in the file from which they were loaded. The same anonymous <code>id</code> in two different files refers to <em>a different object</em> in each file. 
+			</p>
+			<p>
+				Any given stanza <em>does not</em> have to contain all the required tags. A file (or collection of files) may contain multiple stanzas that describe different aspects of an object. A <em>required</em> tag must be specified at least once for each object in a given set of files. This makes it possible for optional information to be stored in a separate file, and only loaded when necessary. 
+			</p>
+			<p>
+				This means that parsers must wait until the end of the parse batch to check whether required information is missing. Multiple descriptions may produce parse errors if: 
+			</p>
+			<ol>
+				<li>
+					A stanza contains tags that contradict a previous stanza (ie one term description gives a different term name than another description) 
+				</li>
+				<li>
+					A parser has processed all the files in a batch, but an object is still missing some required value (such as a term name). 
+				</li>
+			</ol>
+			<p>
+				There are currently three supported stanza types: <code>[Term]</code>, <code>[Typedef]</code>, <code>[Instance]</code>. Parsers/serializers will round-trip (successfully load and save) unrecognized stanzas. 
+			</p>
+			<h4 id="S.2.2.1">Stanza Types</h4> 
+			<dl>
+				<dt>
+					Term 
+				</dt>
+				<dd>
+					Term stanzas constitute the
+					nodes in an ontology
+					graph. Formally a Term stanza
+					is equivalent to
+					a <strong>Class</strong>
+					declaration in OWL.
+				</dd>
+				<dt>
+					Typedef 
+				</dt>
+				<dd>
+					Typedef stanzas constitute the
+					edge labels that may be used
+					in an ontology graph. Also
+					known as relations,
+					relationship types, properties
+					or predicates. The name
+					"Typedef" is somewhat
+					confusing but is retained for
+					forwards
+					compatibility. Formally
+					equivalent to
+					a <strong>property</strong> in OWL.
+				</dd>
+				<dt>
+					Instance 
+				</dt>
+				<dd>
+					Instance stanzas are used to represent the spatiotemporal particulars that instantiate types. Note that instances are typically not represented in ontologies. OBO allows them for completeness, to allow generalized data exchange and for compatibility with other languages. 
+				</dd>
+			</dl>
+			<h4 id="S.2.2.2">Tags in a [Term] Stanza</h4><h5>Required tags</h5> 
+			<dl class="tableWide codeList">
+				<dt>
+					id 
+				</dt>
+				<dd>
+					The unique id of the current
+					term. Cardinality: <strong>exactly
+					one</strong>.
+				</dd>
+			</dl>
+			<h5>Optional tags</h5> 
+			<dl class="tableWide codeList">
+				<dt>
+					name 
+				</dt>
+				<dd>
+					The term name. Any term may
+					have only <strong>zero or
+					one</strong> name
+					defined. Cardinality: <strong>zero
+					or one</strong>
+					- If multiple term names are defined, it is a parse error. <span class="new_txt">In 1.2 name was required. This has been relaxed in 1.4. This helps with OWL interoperability, as labels are optional in OWL</span> 
+				</dd>
+				<dt>
+					is_anonymous 
+				</dt>
+				<dd>
+					Whether or not the current
+					object has an anonymous
+					id. Cardinality: <strong>zero
+					or one</strong>. The semantics
+					are the same as B-Nodes in RDF.
+				</dd>
+				<dt>
+					alt_id 
+				</dt>
+				<dd>
+					Defines an alternate id for
+					this
+					term. Cardinality: <strong>any</strong>. A
+					term may have any number of alternate ids. 
+				</dd>
+				<dt>
+					def 
+				</dt>
+				<dd>
+					The definition of the current
+					term. Cardinality: <strong>zero
+					or one</strong>.
+					More than one definition for a term generates a parse error. The value of this tag should be the quote enclosed definition text, followed by a dbxref list containing dbxrefs that describe the origin of this definition (see <a href="#S.2.2.3">dbxref formatting</a> for information on how dbxref lists are encoded). An example of this tag would look like this: 
+					<div class="fmt">
+						<p>
+							<code> definition: "The breakdown into simpler components of (+)-camphor, a bicyclic monoterpene ketone." [UM-BBD:pathway "", http://umbbd.ahc.umn.edu/cam/cam_map.html ""] </code> 
+						</p>
+					</div>
+				</dd>
+				<dt>
+					comment 
+				</dt>
+				<dd>
+					A comment for this term. Cardinality: <strong>zero
+					or one</strong>. There must be zero or one instances of this tag per term description. More than one comment for a term generates a parse error. 
+				</dd>
+				<dt>
+					subset 
+				</dt>
+				<dd>
+					This tag indicates a term
+					subset to which this term
+					belongs. The value of this tag
+					must be a subset name as
+					defined in
+					a <code>subsetdef</code> tag
+					in the file header. If the
+					value of this tag is not
+					mentioned in
+					a <code>subsetdef</code> tag,
+					a parse error will be
+					generated. Cardinality: <strong>any</strong>. A
+					term may belong to any number of subsets. 
+				</dd>
+				<dt>
+					synonym 
+				</dt>
+				<dd>
+					This tag gives a synonym for this term, some xrefs to describe the origins of the synonym, and may indicate a synonym category or scope information. Cardinality: <strong>any</strong>.
+					<p>
+						The value consists of a quote enclosed synonym text, a scope identifier, an optional synonym type name, and an optional dbxref list, like this: 
+					</p>
+					<div class="fmt">
+						<p>
+							<code> synonym: "The other white meat" EXACT MARKETING_SLOGAN [MEAT:00324, BACONBASE:03021] </code> 
+						</p>
+					</div>
+					<p>
+						The synonym scope may be one of four values: <code>EXACT</code>, <code>BROAD</code>, <code>NARROW</code>, <code>RELATED</code>. If the first form is used to specify a synonym, the scope is assumed to be <code>RELATED</code>. 
+					</p>
+					<p>
+						The synonym type must be the id of a synonym type defined by a <code>synonymtypedef</code> line in the header. If the synonym type has a default scope, that scope is used regardless of any scope declaration given by a synonym tag. 
+					</p>
+					<p>
+						The dbxref list is formatted as specified in <a href="#S.2.2.3">dbxref formatting</a>. A term may have any number of synonyms. 
+					</p>
+				</dd>
+				<dt>
+					exact_synonym 
+				</dt>
+				<dd>
+					Deprecated. An alias for the <code>synonym</code> tag with the scope modifier set to <code>EXACT</code>. 
+				</dd>
+				<dt>
+					narrow_synonym 
+				</dt>
+				<dd>
+					Deprecated. An alias for the <code>synonym</code> tag with the scope modifier set to <code>NARROW</code>. 
+				</dd>
+				<dt>
+					broad_synonym 
+				</dt>
+				<dd>
+					Deprecated. An alias for the <code>synonym</code> tag with the scope modifier set to <code>BROAD</code>. 
+				</dd>
+				<dt>
+					xref 
+				</dt>
+				<dd>
+					A dbxref that describes an
+					analagous term in another
+					vocabulary
+					(see <a href="#S.2.2.3">dbxref
+					formatting</a> for information
+					about how the value of this
+					tag must be
+					formatted). Cardinality: <strong>any</strong>. A
+					term may have any number of xrefs. 
+				</dd>
+				<dt>
+					xref_analog 
+				</dt>
+				<dd>
+					Deprecated. An alias for the <code>xref</code> tag. 
+				</dd>
+				<dt>
+					xref_unk 
+				</dt>
+				<dd>
+					Deprecated. An alias for the <code>xref</code> tag. 
+				</dd>
+				<dt>
+					is_a 
+				</dt>
+				<dd>
+					This tag describes a
+					subclassing relationship
+					between one term and
+					another. The value is the id
+					of the term of which this term
+					is a subclass. A term may have
+					any number
+					of <code>is_a</code>
+					relationships. This is
+					equivalent to a SubClassOf
+					axiom in OWL. Cardinality: <strong>any</strong>.
+					<p>
+						Parsers which support trailing modifiers may optionally parse the following trailing modifier tags for <code>is_a</code>: 
+					</p>
+					<div class="fmt">
+						<p>
+							<code> namespace &lt;any namespace id&gt; 
+								<br>
+								derived true OR false </code> 
+						</p>
+					</div>
+					<p>
+						The <code>namespace</code> modifier allows the <code>is_a</code> relationship to be assigned its own namespace (independent of the namespace of the superclass or subclass of this <code>is_a</code> relationship). 
+					</p>
+					<p>
+						The <code>derived</code> modifier indicates that the <code>is_a</code> relationship was not explicitly defined by a human ontology designer, but was created automatically by a reasoner, and could be re-derived using the non-derived relationships in the ontology. 
+					</p>
+					<p>
+						This tag previously supported the <code>completes</code> trailing modifier. This modifier is now deprecated. Use the <code>intersection_of</code> tag instead. 
+					</p>
+				</dd>
+				<dt>
+					intersection_of 
+				</dt>
+				<dd>
+                                  Cardinality: <strong>EITHER zero OR
+					two or more</strong>.
+					This tag indicates that this term is equivalent to the intersection of several other terms. The value is either a term id, or a relationship type id, a space, and a term id. For example: 
+					<div class="fmt">
+						<p>
+<code>
+id: GO:0000085 <br>
+name: G2 phase of mitotic cell cycle <br>
+intersection_of: GO:0051319 ! G2 phase <br>
+intersection_of: part_of GO:0000278 ! mitotic cell cycle </code> 
+						</p>
+					</div>
+					<p>
+						This means that GO:0000085 is equivalent to any term that is both a subtype of 'G2 phase' and has a part_of relationship to 'mitotic cell cycle' (i.e. the G2 phase of the mitotic cell cycle). Note that whilst relationship tags specify <em>necessary</em> conditions, intersection_of tags specify <em>necessary and sufficient</em> conditions. 
+					</p>
+					<p>
+						A collection of intersection_of tags appearing in a term is also known as a <em>cross-product</em> definition (this is the same as what OWL users know as a <em>defined class</em>, employing intersectionOf constructs). 
+					</p>
+					<p>
+						It is strongly recommended that all intersection_of tags follow a <em>genus-differentia</em> pattern. In this pattern, one of the tags is directly to a term id (the genus) and the other tags are relation term pairs. For example: 
+					</p>
+					<div class="fmt">
+						<p>
+							<code> [Term] 
+								<br>
+								id: GO:0045495 name: pole plasm 
+								<br>
+								intersection_of: GO:0005737 ! cytoplasm 
+								<br>
+								intersection_of: part_of CL:0000023 ! oocyte </code> 
+						</p>
+					</div>
+					<p>
+						These definitions can be read as sentences, such as <em>a pole plasm is equivalent to a cytoplasm that is part_of an oocyte</em> 
+					</p>
+					<p>
+						If any <code>intersection_of</code> tags are specified for a term, at least two <code>intersection_of</code> tags need to be present or it is a parse error. The full intersection for the term is the set of <strong>all</strong> ids specified by <strong>all</strong> intersection_of tags for that term. 
+					</p>
+					<p class="new_txt">
+						As of OBO 1.4, this tag <em>may</em> be applied in Typedef stanzas 
+					</p>
+				</dd>
+				<dt>
+					union_of 
+				</dt>
+				<dd>
+                                  Cardinality: <strong>EITHER zero OR
+					two or more</strong>.
+					This tag indicates that this term represents the union of several other terms. The value is the id of one of the other terms of which this term is a union. 
+					<p>
+						If any <code>union_of</code> tags are specified for a term, at least 2 <code>union_of</code> tags need to be present or it is a parse error. The full union for the term is the set of <strong>all</strong> ids specified by <strong>all</strong> union_of tags for that term. 
+					</p>
+					<p>
+						This tag may not be applied to relationship types. 
+					</p>
+					<p>
+						Parsers which support trailing modifiers may optionally parse the following trailing modifier tag for <code>disjoint_from</code>: 
+					</p>
+					<div class="fmt">
+						<p>
+							<code> namespace &lt;any namespace id&gt; </code> 
+						</p>
+					</div>
+				</dd>
+				<dt>
+					disjoint_from 
+				</dt>
+				<dd>
+                                  Cardinality: <strong>any</strong>.
+
+					This tag indicates that a term is disjoint from another, meaning that the two terms have no instances or subclasses in common. The value is the id of the term from which the current term is disjoint. This tag may not be applied to relationship types. 
+					<p>
+						Parsers which support trailing modifiers may optionally parse the following trailing modifier tag for <code>disjoint_from</code>: 
+					</p>
+					<div class="fmt">
+						<p>
+							<code> namespace &lt;any namespace id&gt; 
+								<br>
+								derived true OR false </code> 
+						</p>
+					</div>
+					<p>
+						The <code>namespace</code> modifier allows the <code>disjoint_from</code> relationship to be assigned its own namespace. 
+					</p>
+					<p>
+						The derived modifier indicates that the <code>disjoint_from</code> relationship was not explicitly defined by a human ontology designer, but was created automatically by a reasoner, and could be re-derived using the non-derived relationships in the ontology. 
+					</p>
+				</dd>
+				<dt>
+					relationship 
+				</dt>
+				<dd>
+                                  Cardinality: <strong>any</strong>.
+					This tag describes a typed relationship between this term and another term or terms. The value of this tag should be the relationship type id, and then the id of the target term, plus, optionally, other target terms. The relationship type name must be a relationship type name as defined in a typedef tag stanza. The <code>[Typedef]</code> must either occur in a document in the current parse batch, or in a file imported via an import header tag. If the relationship type name is undefined, a parse error will be generated. If the id of the target term cannot be resolved by the end of parsing the current batch of files, this tag describes a "dangling reference"; see <a href="#S.3.4">the parser requirements section</a> for information about how a parser may handle dangling references. If a relationship is specified for a term with an <code>is_obsolete</code> value of true, a parse error will be generated. 
+					<p>
+						Parsers which support trailing modifiers may optionally parse the following trailing modifier tags for relationships: 
+					</p>
+					<div class="fmt">
+						<p>
+							<code> 
+								namespace &lt;any namespace id&gt; 
+								<br>
+								inferred true OR false 
+								<br>
+								cardinality any non-negative integer 
+								<br>
+								maxCardinality any non-negative integer 
+								<br>
+								minCardinality any non-negative integer </code> 
+						</p>
+					</div>
+					<p>
+						The <code>namespace</code> modifier allows the relationship to be assigned its own namespace (independant of the namespace of the parent, child, or type of the relationship). 
+					</p>
+					<p>
+						The <code>inferred</code> modifier indicates that the relationship was not explicitly defined by a human ontology designer, but was created automatically by a reasoner, and could be re-derived using the non-derived relationships in the ontology. 
+					</p>
+					<p>
+						Cardinality qualifiers can be used to specify constraints on the number of relations of the specified type any given instance can have. For example, in the stanza declaring a <code>id: SO:0000634 ! polycistronic mRNA</code>, we can say: <code> relationship: has_part SO:0000316 {minCardinality=2} ! CDS </code> which means that every instance of a transcript of this type has two or more CDS features such that they stand in a has_part relationship from the transcript. 
+					</p>
+					<p>
+                                          The semantics of a
+                                          relationship tag is by
+                                          default
+                                          "all-some". Formally, in OWL
+                                          this corresponds to an
+                                          existential restriction -
+                                          see the <a href="#OWL">OWL</a> section.
+					</p>
+				</dd>
+				<dt>
+					is_obsolete 
+				</dt>
+				<dd>
+                                  Cardinality: <strong>zero or one</strong>.
+
+					Whether or not this term is obsolete. Allowable values are "true" and "false" (false is assumed if this tag is not present). Obsolete terms must have <strong>no</strong> relationships, and no defined <code>is_a</code>, <code>inverse_of</code>, <code>disjoint_from</code>, <code>union_of</code>, or <code>intersection_of</code> tags. 
+				</dd>
+				<dt>
+					replaced_by 
+				</dt>
+				<dd>
+                                  Cardinality: <strong>any</strong>.
+
+					Gives a term which replaces an obsolete term. The value is the id of the replacement term. The value of this tag can safely be used to automatically reassign instances whose <code>instance_of</code> property points to an obsolete term. 
+				</dd>
+				<dd>
+					The <code>replaced_by</code> tag may only be specified for obsolete terms. A single obsolete term may have more than one <code>replaced_by</code> tag. This tag can be used in conjunction with the <code>consider</code> tag. 
+				</dd>
+				<dt>
+					consider 
+				</dt>
+				<dd>
+                                  Cardinality: <strong>any</strong>.
+
+					Gives a term which may be an appropriate substitute for an obsolete term, but needs to be looked at carefully by a human expert before the replacement is done. 
+				</dd>
+				<dd>
+					This tag may only be specified for obsolete terms. A single obsolete term may have many <code>consider</code> tags. This tag can be used in conjunction with <code>replaced_by</code>. 
+				</dd>
+				<dt>
+					use_term 
+				</dt>
+				<dd>
+					Deprecated. Equivalent to <code>consider</code>. 
+				</dd>
+				<dt>
+					builtin 
+				</dt>
+				<dd>
+                                  Cardinality: <strong>zero or one</strong>.
+					Whether or not this term or relation is built in to the OBO format. Allowable values are "true" and "false" (false assumed as default). Rarely used. One example of where this is used is the OBO relations ontology, which provides a stanza for the <span class="rel">is_a</span> relation, even though this relation is axiomatic to the language. 
+				</dd>
+			</dl>
+			<p>
+				Additional tags in 1.4:
+			</p>
+			<dl class="new">
+				<dt>
+					created_by 
+				</dt>
+				<dd>
+                                  Cardinality: <strong>zero or one</strong>.
+
+					Name of the creator of the
+					term. May be a short username,
+					initials or ID. Example: dph
+                                  <p>
+                                    Note that although this tag is
+                                    defined in obof1.4, it can be used
+                                    in obof1.2 harmlessly
+                                  </p>
+				</dd>
+				<dt>
+					creation_date 
+				</dt>
+				<dd>
+                                  Cardinality: <strong>zero or one</strong>.
+					Date of creation of the term
+					specified in ISO 8601
+					format. Example:
+					2009-04-13T01:32:36Z 
+                                  <p>
+                                    Note that although this tag is
+                                    defined in obof1.4, it can be used
+                                    in obof1.2 harmlessly
+                                  </p>
+
+				</dd>
+			</dl>
+			<h4 id="S.2.2.3">Dbxref Formatting</h4> 
+			<p>
+				Dbxref definitions take the following form: 
+			</p>
+			<div class="fmt">
+				<p>
+					<code> &lt;dbxref name&gt; {optional-trailing-modifier} </code> 
+				</p>
+			</div>
+			<p>
+				or 
+			</p>
+			<div class="fmt">
+				<p>
+					<code> &lt;dbxref name&gt; "&lt;dbxref description&gt;" {optional-trailing-modifier} </code> 
+				</p>
+			</div>
+			<p>
+				The dbxref is a colon separated
+				key-value pair. The key should be
+				taken
+				from <a href="http://www.geneontology.org/cgi-bin/xrefs.cgi">GO.xrf_abbs</a>
+				but this is not a requirement. If
+				provided, the dbxref description is a
+				string of zero or more characters
+				describing the dbxref. DBXref
+				descriptions are rarely used and as of
+				obof1.4 are discouraged.
+			</p>
+			<p>
+				Dbxref lists are used when a tag value must contain several dbxrefs. Dbxref lists take the following form: 
+			</p>
+			<div class="fmt">
+				<p>
+					<code> [&lt;dbxref definition&gt;, &lt;dbxref definition&gt;, ...] </code> 
+				</p>
+			</div>
+			<p>
+				The brackets may contain zero or more
+				comma separated dbxref definitions. An
+				example of a dbxref list can be seen
+				in the GO def for "ribonuclease MRP
+				complex": 
+			</p>
+			<div class="fmt">
+				<p>
+					<code>
+def: "A ribonucleoprotein complex that contains an RNA molecule of the snoRNA family, and cleaves the rRNA precursor as part of rRNA transcript processing. It also has other roles: In S. cerevisiae it is involved in cell cycle-regulated degradation of daughter cell-specific mRNAs, while in mammalian cells it also enters the mitochondria and processes RNAs to create RNA primers for DNA replication." [GOC:sgd_curators, PMID:10690410, PMID:14729943, PMID:7510714]
+                                        </code> 
+				</p>
+			</div>
+			<p>
+				Note that the trailing modifiers (like all trailing modifiers) do not need to be decoded or round-tripped by parsers; trailing modifiers can always be optionally ignored. However, all parsers must be able to gracefully ignore trailing modifiers. It is important to recognize that lines which accept a dbxref list may have a trailing modifier for each dbxref in the list, and <em>another</em> trailing modifier for the line itself. 
+			</p>
+			<h4 id="S.2.2.4">Tags in [Typedef] Stanza</h4> 
+			<p>
+				<code>[Typedef]</code> stanzas support almost all the same tags as a <code>[Term]</code> stanza. 
+			</p>
+			<div class="new">
+				<p>
+					In OBO Format 1.2, the following tags were not allowed in a <code>[Typedef]</code> stanza. In 1.4 they <b>are</b> allowed. 
+				</p>
+				<ul>
+					<li>
+						<code>union_of</code>
+					</li>
+					<li>
+						<code>intersection_of</code>
+					</li>
+					<li>
+						<code>disjoint_from</code>
+					</li>
+				</ul>
+			</div>
+			<p>
+				The following additional tags are <em>only</em> allowed in a <code>[Typedef]</code> stanza: 
+			</p>
+			<dl class="tableXtraWide codeList">
+				<dt>
+					domain 
+				</dt>
+				<dd>
+					The id of a term, or a special
+					reserved identifier, which
+					indicates the domain for this
+					relationship type. If a
+					property P has domain D, then
+					any term T that has a
+					relationship of type P to
+					another term is a subclass of
+					D. Note that this
+					does <strong>not</strong> mean
+					that the domain restricts
+					which classes of terms can
+					have a relationship of type P
+					to another term. Rather, it
+					means that any term that has a
+					relationship of type P to
+					another term is <em>by
+					definition</em> a subclass of
+					D. 
+                                  Cardinality: <strong>zero or
+					one</strong>. If the intent is
+					to declare a disjunctive
+					domain, then a new class must
+					be declared and defined using
+					the <code>union_of</code> construct.
+
+				</dd>
+				<dt>
+					range 
+				</dt>
+				<dd>
+					The id of a term, or a special
+					reserved identifier, which
+					indicates acceptable range for
+					this relationship type. If a
+					property P has range R, then
+					any term T that is the target
+					of a relationship of type P is
+					a subclass of R. Note that
+					this does <strong>not</strong>
+					mean that the range restricts
+					which classes of terms can be
+					the target of relationships of
+					type P. Rather, it means that
+					any term that is the target of
+					a relationship of type P
+					is <em>by definition</em> a
+					subclass of R. 
+                                  Cardinality: <strong>zero or
+					one</strong>. If the intent is
+					to declare a disjunctive
+					range, then a new class must
+					be declared and defined using
+					the <code>union_of</code> construct.
+
+				</dd>
+				<dt>
+					inverse_of 
+				</dt>
+				<dd>
+					The id of another relationship
+					type that is the inverse of
+					this relationship type. If
+					relation A is the inverse_of
+					type B, and X has relationship
+					A to Y, then it is implied
+					that Y has relation B to
+					X. <span class="new_txt">In
+					obof1.2 the semantics of
+					inverse_of were unclear, as
+					obof1.2 unofficially allowed
+					type-level relations. In
+					obof1.4, the semantics are
+					identical to OWL</span>. Cardinality: <strong>any</strong>.
+				</dd>
+				<dt>
+					transitive_over 
+				</dt>
+				<dd>
+					The id of another relationship
+					type that this relationship
+					type is transitive over. If P
+					is transitive over Q, and the
+					ontology has X P Y and Y Q Z
+					then it follows that X P Z
+					(term/type level). Equivalent
+					to property chains in OWL2. Cardinality: <strong>any</strong>.
+				</dd>
+				<dt>
+					is_cyclic 
+				</dt>
+				<dd>
+					Whether or not a cycle can be
+					made from this relationship
+					type. If a relationship type
+					is non-cyclic, it is illegal
+					for an ontology to contain a
+					cycle made from
+					user-defined <em>or</em>
+					implied relationships of this
+					type. Allowed values: true or
+					false. Cardinality: <strong>zero
+					or one</strong>.
+				</dd>
+				<dt>
+					is_reflexive 
+				</dt>
+				<dd>
+					Whether this relationship is reflexive. All reflexive relationships are also cyclic. Allowed values: true or false. Term/type level. Cardinality: <strong>zero
+					or one</strong>.
+				</dd>
+				<dt>
+					is_symmetric 
+				</dt>
+				<dd>
+					Whether this relationship is symmetric. All symmetric relationships are also cyclic. Allowed values: true or false. Term/type level. Cardinality: <strong>zero
+					or one</strong>.
+				</dd>
+				<dt>
+					is_anti_symmetric 
+				</dt>
+				<dd>
+					Whether this relationship is anti-symmetric. Allowed values: true or false. Term/type level. Cardinality: <strong>zero
+					or one</strong>.
+				</dd>
+				<dt>
+					is_transitive 
+				</dt>
+				<dd>
+					Whether this relationship is transitive. Allowed values: true or false. Term/type level. Cardinality: <strong>zero
+					or one</strong>.
+				</dd>
+				<dt>
+					is_metadata_tag 
+				</dt>
+				<dd>
+					Whether this relationship is a metadata tag. Properties that are marked as metadata tags are used to record object metadata. Object metadata is additional information about an object that is useful to track, but does not impact the definition of the object or how it should be treated by a reasoner. Metadata tags might be used to record special term synonyms or structured notes about a term, for example. Cardinality: <strong>zero
+					or one</strong>.
+				</dd>
+				<dt>
+					is_class_level 
+				</dt>
+				<dd>
+					Whether this relation is a
+					class-level relation. In
+					OBO-Format, all relationship
+					tags are taken by default to
+					mean an all-some relationship
+					over an instance level
+					relation. This tag is used for
+					other cases,
+					e.g. lacks_part. In OWL this
+					is translated to a hasValue restriction. Cardinality: <strong>zero
+					or one</strong>.
+				</dd>
+			</dl>
+			<h4 id="S.2.2.5">Tags in an [Instance] Stanza</h4> <h5> Required tags </h5> 
+			<dl class="tableWide codeList">
+				<dt>
+					id 
+				</dt>
+				<dd>
+					The unique id of the current term. Cardinality: <strong>exactly one</strong>.
+				</dd>
+			</dl>
+			<h5> Optional tags </h5> 
+			<dl class="tableWide codeList">
+				<dt>
+					name 
+				</dt>
+				<dd>
+					The instance
+					name. Cardinality: <strong>zero or
+					one</strong>. Any instance may have only <strong>one</strong> name defined. 
+				</dd>
+				<dt>
+					instance_of 
+				</dt>
+				<dd>
+					The term id that gives the
+					class of which this is an
+					instance. Cardinality: <strong>zero
+					or one</strong>. If an instance
+					belongs to multiple classes
+					then a class intersection must
+					be declared.
+				</dd>
+				<dt>
+					property_value 
+				</dt>
+				<dd>
+					This tag binds a property to a value in this instance. The value of this tag is a relationship type id, a space, and a value specifier. The value specifier may have one of two forms; in the first form, it is just the id of some other instance, relationship type or term. In the second form, the value is given by a quoted string, a space, and datatype identifier. See <a href="#S.1.6">IDs</a> for more information on legal datatype identifiers. 
+					<div class="fmt">
+						<p>
+							<code> [Instance] 
+								<br>
+								id: john 
+								<br>
+								name: John Day-Richter 
+								<br>
+								instance_of: boy 
+								<br>
+								property_value: married_to heather 
+								<br>
+								property_value: shoe_size "8" xsd:positiveInteger </code> 
+						</p>
+					</div>
+                                        Cardinality: <strong>any</strong>.
+				</dd>
+			</dl>
+			<p>
+				The following optional tags are also allowable for instances. They have exactly the same syntax and semantics as defined in <a href="#S.2.2.2">tags in a term stanza</a>: 
+			</p>
+			<ul>
+				<li>
+					is_anonymous 
+				</li>
+				<li>
+					namespace 
+				</li>
+				<li>
+					alt_id 
+				</li>
+				<li>
+					comment 
+				</li>
+				<li>
+					xref 
+				</li>
+				<li>
+					synonym 
+				</li>
+				<li>
+					created_by 
+				</li>
+				<li>
+					creation_date 
+				</li>
+				<li>
+					is_obsolete 
+				</li>
+				<li>
+					replaced_by 
+				</li>
+				<li>
+					consider 
+				</li>
+			</ul>
+			<p>
+				The <code>replaced_by</code> and <code>consider</code> tags are also allowable for obsolete instances, but they must refer to another instance, rather than another term, to use as a replacement. 
+			</p>
+		</div>
+		<div class="block">
+			<h2 id="S.3">Parsers and Serializers</h2><h3 id="S.3.1">General Behavior</h3> 
+			<p>
+				All parsers should be capable of failing gracefully and generating errors explaining the failure. Parsers may optionally be capable of generating warnings, if the file being read contains non-fatal errors. 
+			</p>
+			<h3 id="S.3.2">Handling Unrecognized Tags</h3> 
+			<p>
+				A parser may do one of several things when an unrecognized tag is found: 
+			</p>
+			<ul class="sampList">
+				<li>
+					<samp>FAIL</samp>: report a fatal error and terminate parsing 
+				</li>
+				<li>
+					<samp>WARN</samp>: report a warning, but continue parsing and ignore the unrecognized tag 
+				</li>
+				<li>
+					<samp>WARN_AND_RECORD</samp>: report a warning, but record the unrecognized tag for later serialization 
+				</li>
+				<li>
+					<samp>IGNORE</samp>: silently ignore the unrecognized tag 
+				</li>
+				<li>
+					<samp>RECORD</samp>: record the unrecognized tag for later serialization <em>(recommended)</em> 
+				</li>
+			</ul>
+			<h3 id="S.3.3">Non-Roundtripping Header Tags</h3> 
+			<p>
+				The following optional header tags need not survive round-tripping: 
+			</p>
+			<ul>
+				<li>
+					format-version 
+				</li>
+				<li>
+					version 
+				</li>
+				<li>
+					date 
+				</li>
+				<li>
+					saved-by 
+				</li>
+				<li>
+					auto-generated-by 
+				</li>
+			</ul>
+			<p>
+				They do not need to be round tripped, because the correct values will change when the file is saved. 
+			</p>
+			<h3 id="S.3.4">Dangling References</h3> 
+			<p>
+				There are several options when a dangling reference is encountered 
+			</p>
+			<ul class="sampList">
+				<li>
+					<samp>FAIL</samp>: report a fatal error and terminate parsing 
+				</li>
+				<li>
+					<samp>WARN_AND_IGNORE</samp>: report a fatal error and ignore the dangling reference 
+				</li>
+				<li>
+					<samp>WARN_AND_READ</samp>: report a warning and read in the dangling reference, storing it in a form suitable for round-tripping 
+				</li>
+				<li>
+					<samp>READ</samp>: silently read and store the dangling relationship <em>(recommended)</em> 
+				</li>
+			</ul>
+			<h3 id="S.3.5">Serializer Conventions</h3> 
+			<p>
+				Any parser should be able to read correctly formatted files in any layout. However, it is suggested that serializers obey the following conventions to ensure consistency, and to facilitate file comparison (for example in CVS). 
+			</p>
+			<h4 id="S.3.5.1">General Conventions</h4> 
+			<ul>
+				<li>
+					Within a single file, all tags relating to a single entity should appear in the same stanza (thereby minimizing the total number of stanzas and keeping all tags regarding a single entity in the same place) 
+				</li>
+				<li>
+					Any time an identifier is referenced (i.e. anywhere other than an id: tag), it should be accompanied by the corresponding <code>name</code> value in the comments. See this guide for examples. 
+				</li>
+				<li>
+					In any case where the correct ordering of tags is ambiguous (for example, if there are two tags with the same name, or the ordering is not given in this document), tags should be ordered alphabetically, first on the tag name, then on the tag value. 
+				</li>
+			</ul>
+			<h4 id="S.3.5.2">Stanza Conventions</h4> 
+			<p>
+				All new stanza declarations should be preceded by a blank line. <code>[Typedef]</code> stanzas should appear before <code>[Term]</code> stanzas, and <code>[Instance]</code> stanzas should appear after <code>[Term]</code> stanzas. All other stanza types should appear after <code>[Instance]</code> stanzas, in alphabetical order on the stanza name. 
+			</p>
+			<h4 id="S.3.5.3">Header Tags</h4> 
+			<p>
+				Header tags should appear in the following order: 
+			</p>
+			<div class="fmt">
+				<ol class="code">
+					<li>
+						format-version 
+					</li>
+					<li>
+						data-version 
+					</li>
+					<li>
+						date 
+					</li>
+					<li>
+						saved-by 
+					</li>
+					<li>
+						auto-generated-by 
+					</li>
+					<li>
+						import 
+					</li>
+					<li>
+						subsetdef 
+					</li>
+					<li>
+						synonymtypedef 
+					</li>
+					<li>
+						default-namespace 
+					</li>
+                    <li>
+						 namespace-id-rule
+					</li>
+                    <li>
+                         idspace
+					</li>
+                    <li>
+                         treat-xrefs-as-equivalent
+					</li>
+                    <li>
+                         treat-xrefs-as-genus-differentia
+					</li>
+                    <li>
+                         treat-xrefs-as-relationship
+					</li>
+                    <li>
+                         treat-xrefs-as-is_a
+					</li>
+					<li>
+						remark 
+					</li>
+                    <li>
+						ontology 
+					</li>
+				</ol>
+			</div>
+			<h4 id="S.3.5.4">Ordering Term and Typedef stanzas</h4> 
+			<p>
+				<code>[Term]</code>, <code>[Typdef]</code>, and <code>[Instance]</code> stanzas should be serialized in alphabetical order on the value of their id tag. 
+			</p>
+			<h4 id="S.3.5.5">Ordering Term and Typedef tags</h4> 
+			<p>
+				Term tags should appear in the following order: 
+			</p>
+			<div class="fmt">
+				<ol class="code">
+					<li>
+						id 
+					</li>
+					<li>
+						is_anonymous 
+					</li>
+					<li>
+						name 
+					</li>
+					<li>
+						namespace 
+					</li>
+					<li>
+						alt_id 
+					</li>
+					<li>
+						def 
+					</li>
+					<li>
+						comment 
+					</li>
+					<li>
+						subset 
+					</li>
+					<li>
+						synonym 
+					</li>
+					<li>
+						xref 
+					</li>
+                    <li>
+						builtin 
+					</li>
+					<li>
+						property_value 
+					</li>
+					<li>
+						is_a 
+					</li>
+					<li>
+						intersection_of 
+					</li>
+					<li>
+						union_of 
+					</li>
+                    <li>
+						equivalent_to 
+					</li>
+					<li>
+						disjoint_from 
+					</li>
+					<li>
+						relationship 
+					</li>
+					<li>
+						created_by 
+					</li>
+					<li>
+						creation_date 
+					</li>
+					<li>
+						is_obsolete 
+					</li>
+					<li>
+						replaced_by 
+					</li>
+					<li>
+						consider 
+					</li>
+				</ol>
+			</div>
+			<p>
+				Typedef tags should appear in the following order: 
+			</p>
+			<div class="fmt">
+				<ol class="code">
+					<li>
+						id 
+					</li>
+					<li>
+						is_anonymous 
+					</li>
+					<li>
+						name 
+					</li>
+					<li>
+						namespace 
+					</li>
+					<li>
+						alt_id 
+					</li>
+					<li>
+						def 
+					</li>
+					<li>
+						comment 
+					</li>
+					<li>
+						subset 
+					</li>
+					<li>
+						synonym 
+					</li>
+					<li>
+						xref 
+					</li>
+					<li>
+						property_value 
+					</li>
+					<li>
+						domain 
+					</li>
+					<li>
+						range 
+					</li>
+                    <li>
+						builtin 
+					</li>
+					 <li>
+                                                holds_over_chain
+                                        </li>
+					<li>
+						is_anti_symmetric 
+					</li>
+					<li>
+						is_cyclic 
+					</li>
+					<li>
+						is_reflexive 
+					</li>
+					<li>
+						is_symmetric 
+					</li>
+					<li>
+						is_transitive 
+					</li>
+                    <li>
+						is_functional 
+					</li>
+                    <li>
+						is_inverse_functional 
+					</li>
+					<li>
+						is_a 
+					</li>
+					<li>
+						intersection_of 
+					</li>
+					<li>
+						union_of 
+					</li>
+                    <li>
+						equivalent_to 
+					</li>
+					<li>
+						disjoint_from 
+					</li>
+					<li>
+						inverse_of 
+					</li>
+					<li>
+						transitive_over 
+					</li>
+					<li>
+						equivalent_to_chain
+					</li>
+					<li>
+						disjoint_over
+					</li>
+					<li>
+						relationship 
+					</li>
+                    <li>
+						is_obsolete 
+					</li>
+					<li>
+						created_by 
+					</li>
+					<li>
+						creation_date 
+					</li>
+					<li>
+						replaced_by 
+					</li>
+					<li>
+						consider 
+					</li>
+					<li>
+						expand_assertion_to
+					</li>
+					<li>
+						expand_expression_to
+					</li>
+					<li>
+						is_metadata_tag 
+					</li>
+					<li>
+						is_class_level 
+					</li>
+
+				</ol>
+			</div>
+			<p>
+				Instance tags should appear in the following order: 
+			</p>
+			<div class="fmt">
+				<ol class="code">
+					<li>
+						id 
+					</li>
+					<li>
+						is_anonymous 
+					</li>
+					<li>
+						name 
+					</li>
+					<li>
+						namespace 
+					</li>
+					<li>
+						alt_id 
+					</li>
+                    <li>
+						def 
+					</li>
+					<li>
+						comment 
+					</li>
+					<li>
+						subset 
+					</li>
+					<li>
+						synonym 
+					</li>
+					<li>
+						xref 
+					</li>
+					<li>
+						instance_of 
+					</li>
+					<li>
+						property_value 
+					</li>
+					<li>
+						relationship
+					</li>
+					<li>
+						created_by 
+					</li>
+					<li>
+						creation_date 
+					</li>
+					<li>
+						is_obsolete 
+					</li>
+					<li>
+						replaced_by 
+					</li>
+					<li>
+						consider 
+					</li>
+				</ol>
+			</div>
+			<h4 id="S.3.5.6">Dbxref lists</h4> 
+			<p>
+				Values in dbxref lists should be ordered alphabetically on the dbxref name. 
+			</p>
+            <h4 id="S.3.5.7">Clause order</h4> 
+			<div>
+            Clauses of the with the same tag should be sorted in the following way:
+            <ol>
+                <li>
+                    If tag is intersection_of, first sort the intersection_of clauses into groups by values count, prefer short ones.
+                </li>
+                <li>
+                    The sort keys are the clause values and their
+                    string representation. The sort order is alphabetically and case-insensitive.
+                </li>
+                <li>
+                    If two values are equal, alphabetically, case-sensitive
+                </li>
+            </ol>
+			</div>
+			<p class="toTop">
+				<a href="#top" title="Back to the top of the page">Back to top</a> 
+			</p>
+		</div>
+		<div class="block">
+			<h2 id="S.4">Changes in 1.4</h2> <h3 id="S.4.1">Changes that break forwards compatibility</h3> 
+			<ul>
+				<li>
+					All string values are treated as instances of <a rel="external" href="http://www.w3.org/2007/OWL/wiki/InternationalizedStringSpec#Definition_of_the_rdf:text_Datatype">rdf:text</a>. String values that lack '@' a followed by a valid language tag are treated as if they have a trailing '@'. Strings that should genuinely contain the '@' character must escape it. This is technically a forwards-incompatible change in that it changes the semantics of strings. However, it is syntactically forwards compatible. 
+				</li>
+				<li>
+					The semantics
+					of <strong>inverse_of</strong>
+					were not clear in 1.2. In 1.4,
+					relations are instance-level
+					and this tag has the same
+					meaning as the
+					InverseProperties in OWL2.
+				</li>
+				<li>
+					Use of the backslash character "\" to split a tag over multiple lines was never used in practice and has been deprecated. 
+				</li>
+				<li>
+					Unicode support. TODO. 
+				</li>
+			</ul>
+			<h4>New Header Tags</h4> <h5> Header Macros </h5> 
+			<ul>
+				<li>
+					treat-xrefs-as-equivalent 
+				</li>
+				<li>
+					treat-xrefs-as-genus-differentia 
+				</li>
+				<li>
+					treat-xrefs-as-relationship 
+				</li>
+				<li>
+					treat-xrefs-as-is_a 
+				</li>
+				<li>
+					relax-unique-identifier-assumption-for-namespace 
+				</li>
+				<li>
+					relax-unique-label-assumption-for-namespace 
+				</li>
+			</ul>
+			<h5> Definitional Expressions </h5>
+			<p>
+				ID Definitional Expressions added. E.g. <strong>GO:0005737^part_of(CL:0000023)</strong> can be used wherever one wants to say "cytoplasm of oocyte". This is treated as if it has the following definition: 
+			</p>
+			<div class="fmt">
+				<p>
+					<code> [Term] 
+						<br>
+						id: GO:0005737^part_of(CL:0000023) 
+						<br>
+						intersection_of: GO:0005737 ! cytoplasm 
+						<br>
+						intersection_of: part_of CL:0000023 ! oocyte </code> 
+				</p>
+			</div>
+			<p>
+				This is known as post-composition. We can refer to an unnamed entity (i.e. one with no ID in any ontology) by describing it via a logical expression. The The Obolog document for the formal semantics of these expressions. 
+			</p>
+			<h5> Relation Tags </h5> 
+			<p>
+				Many of these are advanced features that can safely be ignored by parsers. 
+			</p>
+			<dl class="tableWide codeList">
+				<dt>
+					holds_over_chain 
+				</dt>
+				<dd>
+					See <a href="http://wiki.geneontology.org/index.php/Relation_composition">Relation
+					Composition</a>. This is an
+					extension of the
+					transitive_over tag,
+					introduced in 1.2. The
+					equivalent construct in OWL is
+					a property chain.
+                                        <code>
+                                          holds_over_chain(R R1 R2)
+                                          ==> R1(x y) R2(y z) -> R(x z)
+                                        </code>
+
+				</dd>
+				<dt>
+					equivalent_to_chain 
+				</dt>
+				<dd>
+					See <a href="http://wiki.geneontology.org/index.php/Relation_composition">Relation
+					Composition</a>. This is an
+					extension of the
+					transitive_over tag,
+					introduced in 1.2.
+                                        <code>
+                                          equivalent_to_chain(R R1 R2)
+                                          ==> R1(x y) R2(y z) -> R(x z)
+                                        </code>
+                                        <code>
+                                          equivalent_to_chain(R R1 R2)
+                                          ==> R(x z) -> exists y: R1(x y) R2(y z)
+                                        </code>
+
+				</dd>
+				<dt>
+					disjoint_over 
+				</dt>
+				<dd>
+					For
+					example: <strong>spatially_disconnected_from</strong>
+					is disjoint_over part_of, in
+					that two disconnected entities
+					have no parts in common. This
+					can be translated to OWL as:
+                                        <code>
+                                          disjoint_over(R S), R(A B)
+                                          ==> (S some A) disjointFrom
+                                          (S some B)
+                                        </code>
+
+				</dd>
+				<dt>
+					intersection_of 
+				</dt>
+				<dd>
+					Previously, this tag could only be used in [Term] stanzas, to define types/classes/universals/patterns. Now it can be used to define relations. For example, we can define a temporal relation coincides_with as being true if both start end end boundaries are shared. 
+					<div class="fmt">
+						<p>
+							<code> [Typedef] 
+								<br>
+								id: coincides_with 
+								<br>
+								intersection_of: has_same_start_as 
+								<br>
+								intersection_of: has_same_end_as </code> 
+						</p>
+					</div>
+				</dd>
+				<dt>
+					union_of 
+				</dt>
+				<dd>
+					Previously, this tag could only be used in [Term] stanzas, to define types/classes/universals/patterns. Now it can be used to define relations 
+				</dd>
+				<dt>
+					is_functional 
+				</dt>
+				<dd>
+					Relation acts like a
+					function. E.g. any entity only
+					relates to one other entity by
+					this relation. Identical to
+					OWL FunctionalProperty
+				</dd>
+				<dt>
+					is_inverse_functional 
+				</dt>
+				<dd>
+					Like is_functional, but the
+					opposite "direction". Identical to
+					OWL InverseFunctionalProperty
+				</dd>
+			</dl>
+			<h5> Tags for either relations or types/classes </h5> 
+			<dl class="tableWide codeList">
+				<dt>
+					equivalent_to 
+				</dt>
+				<dd>
+					Used to specify exact
+					equivalence between two
+					instances, types or relations
+					. Identical to
+					OWL EquivalentClasses
+				</dd>
+			</dl>
+			<p class="toTop">
+				<a href="#top" title="Back to the top of the page">Back to top</a> 
+			</p>
+			<h4 id="OWL">OBO and OWL</h5> 
+
+                        <p>
+                        The formal specification of the mapping
+                        between OBO format syntax and OWL is provided
+                        in the
+			<a href="http://purl.obolibrary.org/obo/oboformat/spec.html">The
+                         OBO Syntax and Semantics</a> document. The
+                         intention is that OBO-Format can be regarded
+                         as a syntax expressing a subset of OWL2.
+                        </p>
+                        <p>
+                        </p>
+                        <h5>Translating basic relationships to OWL</h5>
+                        <p>
+                        An <code>is_a</code> tag is translated to a
+                        subclass axiom, and all relationships are
+                        treated by default as all-some
+                        (existential). See later for advanced features
+                        for representing other kinds of
+                        quantification.
+                        </p>
+
+                        <p>
+                          <code> 
+[Term]<br>
+id: GO:0000085<br>
+name: G2 phase of mitotic cell cycle<br>
+is_a: GO:0051319 ! G2 phase<br>
+<br>
+                          </code> 
+                          translates to
+                          <code> 
+<br>
+Class: GO_0000085<br>
+Annotations: label 'G2 phase of mitotic cell cycle'@en<br>
+SubClassOf: GO:0051319<br>
+                          </code> 
+                        </p>
+
+                        <p>
+                          <code> 
+[Term]<br>
+id: GO:0000085<br>
+name: G2 phase of mitotic cell cycle<br>
+relationship: part_of GO:0051329 ! interphase of mitotic cell cycle<br>
+                          </code> 
+                          translates to
+                          <code> <br>
+Class: GO_0000085<br>
+Annotations: label 'G2 phase of mitotic cell cycle'@en<br>
+SubClassOf: part_of some GO_0051329<br>
+                          </code> 
+                        </p>
+
+                        <h5>Translating intersection_of tags to OWL</h5>
+                        <p>
+                        A collection of
+                        OBO <code>intersection_of</code> tags are
+                        translated to an owl intersection
+                        construct. There is an implicit equivalence
+                        axiom.
+                        </p>
+
+                        <p>
+                          <code> 
+[Term]<br>
+id: GO:0000085<br>
+name: G2 phase of mitotic cell cycle<br>
+intersection_of: GO:0051319 ! G2 phase<br>
+intersection_of: part_of GO:0000278 ! mitotic cell cycle<br>
+                          </code> 
+                          translates to
+                          <code> 
+Class: GO_0000085
+Annotations:
+ label 'G2 phase of mitotic cell cycle'@en
+EquivalentTo: GO:0051319 and part_of some GO_0000278
+                          </code> 
+                        </p>
+                        <h5>Translating OBO metadata</h5>
+            <p>
+              The IAO ontology-metadata ontology is used for metadata.
+            </p>
+                        <p>
+                          <code> 
+[Term]
+id: GO:0000087
+name: M phase of mitotic cell cycle
+namespace: biological_process
+def: "M phase occurring as part of ...." [GOC:dph, GOC:mah, ISBN:0815316194]
+synonym: "M-phase of mitotic cell cycle" EXACT []
+xref: Reactome:1006743 "M Phase"
+is_a: GO:0000279 ! M phase
+intersection_of: GO:0000279 ! M phase
+intersection_of: part_of GO:0000278 ! mitotic cell cycle
+relationship: part_of GO:0000278 ! mitotic cell cycle
+
+                          </code> 
+                          translates to
+                          <code> 
+Class: GO_0000087<br>
+Annotations:<br>
+ label 'M phase of mitotic cell cycle'@en<br>
+ IAO_TODO ??? 'M-phase of mitotic cell cycle'@en<br>
+ IAO_TODO Reactome_1006743<br>
+ IAO_TODO (IAO_nnnn GOC_dph) TODO "M phase occurring as part of ...."@en 
+<br>
+
+                          </code> 
+                        </p>
+                        <h5>Quantification of restrictions</h5>
+                        <p>
+                          <ul>
+                            <li>All property-class (P,C) pairs will by
+                            default be treated as SomeValuesFrom(P,C)</li>
+                            <li>An exception is made if cardinality
+                            is specified, then the obvious
+                            cardinality OWL2 construct(s) are
+                            used</li>
+                            <li>
+                              If a property is declared class-level in
+                              the Typedef stanza via an is_class_level
+                              true tag, then the pair is treated as
+                              HasValue(P,C). The rationale for this is
+                              explained in the macros document.
+                            </li>
+                          </ul>
+                        </p>
+                        <h5 id="OWL">OWL Macros</h5> 
+                        <p>
+                          The following two tags can be used within
+                          Typedef stanzas:
+                        <ul>
+                          <li><code>expand_expression_to</code> maps
+                          to an AnnotationAssertion(IAO_0000424 P V)</li>
+                          <li><code>expand_assertion_to</code> maps
+                          to an AnnotationAssertion(IAO_0000425 P V)</li>
+                        </ul>
+                        These specify macro-expansions. More details
+                        can be found
+                        in <a href="http://github.com/cmungall/obo2owl/raw/f8d31b1838069477b908bce7c6cd1369e5283782/papers/shortcuts-submitted-owled2010.pdf">this
+                        document</a> and
+                        in <a href="http://www.slideshare.net/cmungall/macro-discussion-owled-2010">this
+                        presentation</a>.
+                        </p>
+                        <h5>Extensions to OWL2</h5>
+                        <ul>
+                          <li>OWL2 prohibits cardinality constraints
+                          on transitive object properties, but
+                          obof1.4 allows this.</li>
+                          <li>obof1.4 allows property chains in both
+                            directions via
+                            the <code>equivalent_to_chain</code> tag.</li>
+                          <li>obof1.4 allows property definitions via
+                            intersection and union constructs.
+                            </li>
+                        </ul>
+
+		</div>
+	</div>
+</div>
+</body>
+</html>
