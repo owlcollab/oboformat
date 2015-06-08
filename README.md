@@ -7,6 +7,11 @@ This project contains documentation for OBO Format
   * [obof1.4 guide](http://owlcollab.github.io/oboformat/doc/GO.format.obo-1_4.html)
   * [obof1.2 guide](http://owlcollab.github.io/oboformat/doc/GO.format.obo-1_2.html)
 
+Note that the spec is currently hosted on
+http://owlcollab.github.io/oboformat/doc/obo-syntax.html -- however,
+you should be sure to bookmark the permanent URL, which is
+http://purl.obolibrary.org/obo/oboformat/spec.html
+
 Use this URL:
 
  * [http://owlcollab.github.io/oboformat/doc/obo-syntax.html](http://owlcollab.github.io/oboformat/doc/obo-syntax.html)
