@@ -7,9 +7,7 @@ This is a java implementation of
 
 GETTING THE CODE
 
-For now there are no releases; get the code via svn:
-
-  svn checkout http://oboformat.googlecode.com/svn/trunk/ oboformat-read-only
+The code is now integrated into the owlapi
 
 RUNNING THE CONVERTER ON THE COMMAND LINE:
 
