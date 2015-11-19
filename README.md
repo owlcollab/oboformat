@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/owlcollab/oboformat.svg?branch=master)](https://travis-ci.org/owlcollab/oboformat)
+[![DOI](https://zenodo.org/badge/13996/owlcollab/oboformat.svg)](https://zenodo.org/badge/latestdoi/13996/owlcollab/oboformat)
+
 This project contains documentation for OBO Format
 
 ## Specification
