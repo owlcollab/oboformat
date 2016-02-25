@@ -2,7 +2,7 @@ package org.obolibrary.oboformat.model;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -18,9 +18,9 @@ import org.obolibrary.oboformat.parser.OBOFormatConstants.OboFormatTag;
  */
 public class OBODoc {
 	protected Frame headerFrame;
-	protected Map<String,Frame> termFrameMap = new HashMap<String,Frame>();
-	protected Map<String,Frame> typedefFrameMap = new HashMap<String,Frame>();
-	protected Map<String,Frame> instanceFrameMap = new HashMap<String,Frame>();
+	protected Map<String,Frame> termFrameMap = new LinkedHashMap<String,Frame>();
+	protected Map<String,Frame> typedefFrameMap = new LinkedHashMap<String,Frame>();
+	protected Map<String,Frame> instanceFrameMap = new LinkedHashMap<String,Frame>();
 	protected Collection<Frame> annotationFrames = new LinkedList<Frame>();
 	protected Collection<OBODoc> importedOBODocs = new LinkedList<OBODoc>();
 
