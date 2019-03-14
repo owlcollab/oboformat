@@ -504,6 +504,8 @@ the canonical prefixed ID pattern.
 <span class="nonterminal">Class-ID</span> ::=  <span class="nonterminal">ID</span>
 <span class="nonterminal">Rel-ID</span> ::=  <span class="nonterminal">ID</span>
 <span class="nonterminal">Instance-ID</span> ::=  <span class="nonterminal">ID</span>
+<span class="nonterminal">Person-ID</span> ::=  <span class="nonterminal">ID</span>
+<span class="nonterminal">Subset-ID</span> ::=  <span class="nonterminal">ID</span>
 <!-- TODO: URLs -->
 <span class="nonterminal">ID</span> ::=  <span class="nonterminal">Prefixed-ID</span> | <span class="nonterminal">Unprefixed-ID</span> | <span class="nonterminal">URL-as-ID</span>
 
@@ -573,16 +575,16 @@ order to be more consistent with Manchester Syntax.</p>
 <span class="nonterminal">header-frame</span> ::= { <span class="nonterminal">header-clause</span> <span class="nonterminal">nl*</span> }
 <span class="nonterminal">header-clause</span> ::= <span class="nonterminal">format-version-TVP</span>
         | <span class="nonterminal">data-version-TVP</span>
-        | <span class="nonterminal">date-Tag</span>  <span class="nonterminal">DD:MM:YYYY</span> <span class="nonterminal">sp</span> <span class="nonterminal">hh:mm</span>
+        | <span class="nonterminal">date-Tag</span>  <span class="nonterminal">DD:MM:YYYY</span> <span class="nonterminal">ws</span> <span class="nonterminal">hh:mm</span>
         | <span class="nonterminal">saved-by-TVP</span>
         | <span class="nonterminal">auto-generated-by-TVP</span>
         | <span class="nonterminal">import-Tag</span>  <span class="nonterminal">IRI</span> | <span class="nonterminal">filepath</span>
-        | <span class="nonterminal">subsetdef-Tag</span>  <span class="nonterminal">ID</span> <span class="nonterminal">sp</span> <span class="nonterminal">QuotedString</span>
-        | <span class="nonterminal">synonymtypedef-Tag</span>  <span class="nonterminal">ID</span> <span class="nonterminal">sp</span> <span class="nonterminal">QuotedString</span>
+        | <span class="nonterminal">subsetdef-Tag</span>  <span class="nonterminal">Subset-ID</span> <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span>
+        | <span class="nonterminal">synonymtypedef-Tag</span>  <span class="nonterminal">ID</span> <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span>
              [  <span class="nonterminal">SynonymScope</span> ]
         | <span class="nonterminal">default-namespace-Tag</span>  <span class="nonterminal">OBONamespace</span>
-        | <span class="nonterminal">idspace-Tag</span> <span class="nonterminal">IDPrefix</span> <span class="nonterminal">sp</span> <span class="nonterminal">IRI</span>
-            [ <span class="nonterminal">sp</span> <span class="nonterminal">QuotedString</span> ]
+        | <span class="nonterminal">idspace-Tag</span> <span class="nonterminal">IDPrefix</span> <span class="nonterminal">ws</span> <span class="nonterminal">IRI</span>
+            [ <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span> ]
         | <span class="nonterminal">treat-xrefs-as-equivalent-Tag</span> <span class="nonterminal">IDPrefix</span>
         | <span class="nonterminal">treat-xrefs-as-genus-differentia-Tag</span> <span class="nonterminal">IDPrefix</span> <span class="nonterminal">ws</span> <span class="nonterminal">Rel-ID</span> <span class="nonterminal">ws</span> <span class="nonterminal">Class-ID</span>
         | <span class="nonterminal">treat-xrefs-as-reverse-genus-differentia-Tag</span> <span class="nonterminal">IDPrefix</span> <span class="nonterminal">ws</span> <span class="nonterminal">Rel-ID</span> <span class="nonterminal">ws</span> <span class="nonterminal">Class-ID</span>
@@ -699,7 +701,7 @@ classes).</p >
 <p class="grammar" style="white-space: pre;">
 <span class="nonterminal">instance-frame</span> ::= [ <span class="nonterminal">nl</span> ]
         '[Instance]' <span class="nonterminal">nl</span>
-        <span class="nonterminal">id-Tag</span> <span class="nonterminal">Relation-ID</span> <span class="nonterminal">EOL</span>
+        <span class="nonterminal">id-Tag</span> <span class="nonterminal">Instance-ID</span> <span class="nonterminal">EOL</span>
         { <span class="nonterminal">instance-frame-clause</span> <span class="nonterminal">EOL</span> }
 
 <span class="nonterminal">instance-frame-clause</span> ::= 
@@ -712,14 +714,14 @@ classes).</p >
         | <span class="nonterminal">subset-Tag</span> <span class="nonterminal">Subset-ID</span> 
         | <span class="nonterminal">synonym-Tag</span> <span class="nonterminal">QuotedString</span> <span class="nonterminal">ws</span> <span class="nonterminal">SynonymScope</span> [ <span class="nonterminal">ws</span> <span class="nonterminal">SynonymType-ID</span> ] <span class="nonterminal">XrefList</span> 
         | <span class="nonterminal">xref-Tag</span> <span class="nonterminal">ID</span> 
-        | <span class="nonterminal" style="color:red">property_value-Tag</span> <span class="nonterminal" style="color:red">Relation-ID</span> <span class="nonterminal" style="color:red">ID</span> 
+        | <span class="nonterminal" style="color:red">property_value-Tag</span> <span class="nonterminal" style="color:red">Relation-ID</span> <span class="nonterminal" style="color:red">ID</span>
         | <span class="nonterminal">instance_of-Tag</span> <span class="nonterminal">Class-ID</span> 
         | <span class="nonterminal" style="color:red">PropertyValueTagValue</span> 
         | <span class="nonterminal">relationship-Tag</span> <span class="nonterminal">Rel-ID</span> <span class="nonterminal">ID</span> 
         | <span class="nonterminal">created_by-Tag</span> <span class="nonterminal">Person-ID</span> 
         | <span class="nonterminal">creation_date-Tag</span> <span class="nonterminal">ISO-8601-DateTime</span> 
         | <span class="nonterminal">is-obsolete-BT</span>
-        | <span class="nonterminal">replaced_by-Tag</span> <span class="nonterminal">Rel-ID</span> 
+        | <span class="nonterminal">replaced_by-Tag</span> <span class="nonterminal">Instance-ID</span>
         | <span class="nonterminal">consider-Tag</span> <span class="nonterminal">ID</span> 
 </p >
 
