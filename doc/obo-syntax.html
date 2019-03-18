@@ -566,12 +566,11 @@ order to be more consistent with Manchester Syntax.</p>
 
 <p class="grammar" style="white-space: pre;">
   <span class="nonterminal">OBO-Doc</span> := <span class="nonterminal">header-frame</span> { <span class="nonterminal">entity-frame</span> } <span class="nonterminal">nl*</span>
+  <span class="nonterminal">entity-frame</span> ::= <span class="nonterminal">term-frame</span> | <span class="nonterminal">typedef-frame</span> | <span class="nonterminal">instance-frame</span> 
 </p>
 
 
 <h3><a name="3.2"></a>3.2 OBO Headers</h3>
-
-
 
 <p class="grammar" style="white-space: pre;">
 <span class="nonterminal">header-frame</span> ::= { <span class="nonterminal">header-clause</span> <span class="nonterminal">nl*</span> }
@@ -598,7 +597,6 @@ order to be more consistent with Manchester Syntax.</p>
         | <span class="nonterminal">ontology-TVP</span>
         | <span class="nonterminal">owl-axioms-TVP</span>
         | <span class="nonterminal">UnreservedToken</span> ':'  [  <span class="nonterminal">ws</span> ] <span class="nonterminal">UnquotedString</span>
-<span class="nonterminal">entity-frame</span> ::= <span class="nonterminal">term-frame</span> | <span class="nonterminal">typedef-frame</span> | <span class="nonterminal">instance-frame</span> 
 </p>
 
 
