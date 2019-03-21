@@ -446,7 +446,7 @@ in different contexts.
 
 <p class="grammar" style="white-space: pre;">
 <span class="nonterminal">UniCodeChar</span> ::= <i>any Unicode character</i>
-<span class="nonterminal">OBOChar</span> ::= '\' <span class="nonterminal">Alpha-Char</span> | ( <span class="nonterminal">UniCodeChar</span> - (<span class="nonterminal">NewLineChar</span> | '\') )
+<span class="nonterminal">OBOChar</span> ::= '\:' | '\"' | '\!' | '\' <span class="nonterminal">Alpha-Char</span> | ( <span class="nonterminal">UniCodeChar</span> - (<span class="nonterminal">NewLineChar</span> | '\') )
 <span class="nonterminal">NonWsChar</span> ::=  ( <span class="nonterminal">OBOChar</span> - <span class="nonterminal">WhiteSpaceChar</span> - <span class="nonterminal">NewlineChar</span>) 
 </p>
 
