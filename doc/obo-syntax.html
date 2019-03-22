@@ -446,7 +446,7 @@ in different contexts.
 
 <p class="grammar" style="white-space: pre;">
 <span class="nonterminal">UniCodeChar</span> ::= <i>any Unicode character</i>
-<span class="nonterminal">OBOChar</span> ::= '\' <span class="nonterminal">Alpha-Char</span> | ( <span class="nonterminal">UniCodeChar</span> - (<span class="nonterminal">NewLineChar</span> | '\') )
+<span class="nonterminal">OBOChar</span> ::= '\:' | '\"' | '\!' | '\' <span class="nonterminal">Alpha-Char</span> | ( <span class="nonterminal">UniCodeChar</span> - (<span class="nonterminal">NewLineChar</span> | '\') )
 <span class="nonterminal">NonWsChar</span> ::=  ( <span class="nonterminal">OBOChar</span> - <span class="nonterminal">WhiteSpaceChar</span> - <span class="nonterminal">NewlineChar</span>) 
 </p>
 
@@ -507,7 +507,7 @@ the canonical prefixed ID pattern.
 <span class="nonterminal">Instance-ID</span> ::=  <span class="nonterminal">ID</span>
 <span class="nonterminal">Person-ID</span> ::=  <span class="nonterminal">ID</span>
 <span class="nonterminal">Subset-ID</span> ::=  <span class="nonterminal">ID</span>
-<span class="nonterminal">SynonymType-ID</span> ::=  <span class="nonterminal">ID</span>
+<span class="nonterminal">SynonymType-ID</span> ::=  <span class="nonterminal">ID - ( '[' { <span class="nonterminal">UniCodeChar</span> } ) </span>
 <!-- TODO: URLs -->
 <span class="nonterminal">ID</span> ::=  <span class="nonterminal">Prefixed-ID</span> | <span class="nonterminal">Unprefixed-ID</span> | <span class="nonterminal">URL-as-ID</span>
 
@@ -522,7 +522,7 @@ the canonical prefixed ID pattern.
 <span class="nonterminal">Canonical-LocalID</span> ::=  { <span class="nonterminal">Digit</span> }
 <span class="nonterminal">Canonical-Prefixed-ID</span> ::=  <span class="nonterminal">Canonical-IDPrefix</span> ':' <span class="nonterminal">Canonical-LocalID</span> 
 <span class="nonterminal">NonCanonical-Prefixed-ID</span> ::=  ( <span class="nonterminal">Any-IDPrefix</span> ':' <span class="nonterminal">Any-LocalID</span> ) - <span class="nonterminal">Canonical-Prefixed-ID</span>
-<span class="nonterminal">Any-IDPrefix</span> ::=  { ( <span class="nonterminal">NonWsChar</span> - <span class="nonterminal">':'</span> ) }
+<span class="nonterminal">Any-IDPrefix</span> ::=  { ( <span class="nonterminal">NonWsChar</span> - ':' ) }
 <span class="nonterminal">Any-LocalID</span> ::=  { <span class="nonterminal">NonWsChar</span> }
 
 </p>
@@ -534,18 +534,19 @@ the canonical prefixed ID pattern.
               An XrefList is a comma-separated list of zero or more
               Xrefs inside square brackets (these are manditory). Each
               Xref is a string of characters, optionally followed by a
-              auoted description. Note that commas in the xref need
-              to be escaped. We include an extra production rule for
-              when solitary Xrefs are provided (i.e. with the 'xref'
-              tag) - in this case commas do not need to be escaped.
+              quoted description. Note that commas and square brackets 
+              in the xref need to be escaped. We include an extra 
+              production rule for when solitary Xrefs are provided 
+              (i.e. with the 'xref' tag) - in which case escaping is
+              not needed.
             </p>
 
 <p class="grammar" style="white-space: pre;">
-
-<span class="nonterminal">XrefList</span> ::=  '[' [ <span class="nonterminal">Xref</span> { ',' <span class="nonterminal">ws</span> <span class="nonterminal">XrefNoComma</span> } ] { <span class="nonterminal">ws</span> } ']'
-<span class="nonterminal">XrefNoComma</span> ::= <span class="nonterminal">XrefChar</span> {  <span class="nonterminal">XrefChar</span> }  [ <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span> ]
-<span class="nonterminal">XrefChar</span> ::= (<span class="nonterminal">NonWsChar</span> - ',')
 <span class="nonterminal">Xref</span> ::= <span class="nonterminal">ID</span>  [ <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span> ]
+
+<span class="nonterminal">XrefList</span> ::=  '[' [ <span class="nonterminal">XrefListItem</span> { ',' <span class="nonterminal">ws</span> <span class="nonterminal">XrefListItem</span> } ] [ <span class="nonterminal">ws</span> ] ']'
+<span class="nonterminal">XrefListItem</span> ::= <span class="nonterminal">XrefChar</span> { <span class="nonterminal">XrefChar</span> } [ <span class="nonterminal">ws</span> <span class="nonterminal">QuotedString</span> ]
+<span class="nonterminal">XrefChar</span> ::= (<span class="nonterminal">NonWsChar</span> - ',' - ']')
 
 </p>
 
@@ -633,7 +634,7 @@ classes).</p >
         | <span class="nonterminal">is_obsolete-BT</span>
         | <span class="nonterminal">replaced_by-Tag</span> <span class="nonterminal">Class-ID</span> 
         | <span class="nonterminal">consider-Tag</span> <span class="nonterminal">ID</span> 
-        | <span class="nonterminal">created_by-Tag</span> <span class="nonterminal">Person-ID</span> 
+        | <span class="nonterminal">created_by-TVP</span>
         | <span class="nonterminal">creation_date-Tag</span> <span class="nonterminal">ISO-8601-DateTime</span> 
 </p >
 
@@ -684,12 +685,12 @@ classes).</p >
         | <span class="nonterminal">is-obsolete-BT</span>   
         | <span class="nonterminal">replaced_by-Tag</span> <span class="nonterminal">Rel-ID</span> 
         | <span class="nonterminal">consider-Tag</span> <span class="nonterminal">ID</span> 
-        | <span class="nonterminal">created_by-Tag</span> <span class="nonterminal">Person-ID</span> 
+        | <span class="nonterminal">created_by-TVP</span>
         | <span class="nonterminal">creation_date-Tag</span> <span class="nonterminal">ISO-8601-DateTime</span> 
         | <span class="nonterminal">expand_assertion_to-Tag</span> <span class="nonterminal">QuotedString</span> <span class="nonterminal">ws</span> <span class="nonterminal">XrefList</span> 
         | <span class="nonterminal">expand_expression_to-Tag</span> <span class="nonterminal">QuotedString</span> <span class="nonterminal">ws</span> <span class="nonterminal">XrefList</span> 
         | <span class="nonterminal">is_metadata_tag-BT</span>
-        | <span class="nonterminal">is_class_level_tag-BT</span>
+        | <span class="nonterminal">is_class_level-BT</span>
 </p >
 
 
@@ -713,12 +714,12 @@ classes).</p >
         | <span class="nonterminal">comment-TVP</span>
         | <span class="nonterminal">subset-Tag</span> <span class="nonterminal">Subset-ID</span> 
         | <span class="nonterminal">synonym-Tag</span> <span class="nonterminal">QuotedString</span> <span class="nonterminal">ws</span> <span class="nonterminal">SynonymScope</span> [ <span class="nonterminal">ws</span> <span class="nonterminal">SynonymType-ID</span> ] <span class="nonterminal">ws</span> <span class="nonterminal">XrefList</span> 
-        | <span class="nonterminal">xref-Tag</span> <span class="nonterminal">ID</span> 
+        | <span class="nonterminal">xref-Tag</span> <span class="nonterminal">Xref</span> 
         | <span class="nonterminal" style="color:red">property_value-Tag</span> <span class="nonterminal" style="color:red">Relation-ID</span> <span class="nonterminal" style="color:red">ID</span>
         | <span class="nonterminal">instance_of-Tag</span> <span class="nonterminal">Class-ID</span> 
         | <span class="nonterminal" style="color:red">PropertyValueTagValue</span> 
         | <span class="nonterminal">relationship-Tag</span> <span class="nonterminal">Rel-ID</span> <span class="nonterminal">ws</span> <span class="nonterminal">ID</span> 
-        | <span class="nonterminal">created_by-Tag</span> <span class="nonterminal">Person-ID</span> 
+        | <span class="nonterminal">created_by-TVP</span>
         | <span class="nonterminal">creation_date-Tag</span> <span class="nonterminal">ISO-8601-DateTime</span> 
         | <span class="nonterminal">is-obsolete-BT</span>
         | <span class="nonterminal">replaced_by-Tag</span> <span class="nonterminal">Instance-ID</span>
