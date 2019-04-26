@@ -2057,12 +2057,12 @@ in ontologies. These have also proven useful for NLP purposes.
 
 <tr>
 <td valign="top" style="white-space: pre;">Canonical-Prefixed-ID</td>
-<td valign="top" style="white-space: pre;"><span class="name">T<sup>prefix</sup></span>(Canonical-IDPrefix) <b>'_' Canonical-LocalID</b></td>
+<td valign="top" style="white-space: pre;"><span class="name">T<sup>prefix</sup></span>(Canonical-IDPrefix) <b>Canonical-LocalID</b></td>
 </tr>
 
 <tr>
 <td valign="top" style="white-space: pre;">NonCanonical-Prefixed-ID</td>
-<td valign="top" style="white-space: pre;"><span class="name">T<sup>prefix</sup></span>(Any-IDPrefix) <b>'#_' Any-LocalID</b></td>
+<td valign="top" style="white-space: pre;"><span class="name">T<sup>prefix</sup></span>(Any-IDPrefix) <b>'#' Any-LocalID</b></td>
 </tr>
 
 <tr>
@@ -2123,7 +2123,7 @@ in ontologies. These have also proven useful for NLP purposes.
     If the OBODoc header tag contains an idspace clause <b>idspace(IDPrefix URIPrefix)</b>, then the value of <span class="name">T<sup>prefix</sup></span>(IDPrefix) is URIPrefix
   </li>
   <li>
-    If the OBODoc header tag contains no matching idspace clause then the value of of <span class="name">T<sup>prefix</sup></span>(prefix) is 'http://purl.obolibrary.org/obo/'
+    If the OBODoc header tag contains no matching idspace clause then the value of of <span class="name">T<sup>prefix</sup></span>(prefix) is 'http://purl.obolibrary.org/obo/<b>prefix</b>_'
   </li>
 </ul>
 
