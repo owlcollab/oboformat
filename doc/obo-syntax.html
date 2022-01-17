@@ -1219,21 +1219,21 @@ ignore the owl-axioms headers.
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">Typedef(Rel-id)
+<td valign="top" style="white-space: pre;">Typedef(Rel-ID)
 </td>
-<td>is_metadata_tag(true)
+<td>is_metadata_tag(true) &isin; TypedefFrames[Rel-ID]
 </td>
-<td valign="top" style="white-space: pre;">AnnotationProperty(<span class="name">T</span>(Rel-id)) <span class="name">T<sup>P</sup></span>(Clause-1)..<span class="name">P<sup>C</sup></span>(Clause-n)
+<td valign="top" style="white-space: pre;">AnnotationProperty(<span class="name">T</span>(Rel-ID)) <span class="name">T<sup>P</sup></span>(Clause-1)..<span class="name">P<sup>C</sup></span>(Clause-n)
 </td>
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">Typedef(Rel-id)
+<td valign="top" style="white-space: pre;">Typedef(Rel-ID)
 </td>
-<td>NOT (is_metadata_tag(true))
+<td>is_metadata_tag(true) &notin; TypedefFrames[Rel-ID]
 </td>
 
-<td valign="top" style="white-space: pre;">ObjectProperty(<span class="name">T</span>(Rel-id)) <span class="name">T<sup>P</sup></span>(Clause-1)..<span class="name">P<sup>C</sup></span>(Clause-n)
+<td valign="top" style="white-space: pre;">ObjectProperty(<span class="name">T</span>(Rel-ID)) <span class="name">T<sup>P</sup></span>(Clause-1)..<span class="name">P<sup>C</sup></span>(Clause-n)
 </td>
 </tr>
 
@@ -1277,13 +1277,13 @@ ignore the owl-axioms headers.
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">relationship(Rel-ID TargetClass-ID Qualifiers) <br/><i>on condition:</i> is_class_level(true) &isin; TypedefFrames[Rel-ID]
+<td valign="top" style="white-space: pre;">relationship(Rel-ID TargetClass-ID Qualifiers) <br/><i>on condition:</i> is_metadata_tag(true) &isin; TypedefFrames[Rel-ID]
 </td>
 <td valign="top" style="white-space: pre;">AnnotationAssertion(<span class="name">T</span>(Qualifiers) <span class="name">T</span>(Class-ID) <span class="name">T</span>(Rel-ID) <span class="name">T</span>(Target-Class-ID) )</td>
 </tr>
 
 <tr>
-<td valign="top" style="white-space: pre;">relationship(Rel-ID TargetClass-ID Qualifiers) <br/><i>on condition:</i> is_class_level(true) &notin; TypedefFrames[Rel-ID]
+<td valign="top" style="white-space: pre;">relationship(Rel-ID TargetClass-ID Qualifiers) <br/><i>on condition:</i> is_metadata_tag(true) &notin; TypedefFrames[Rel-ID]
 </td>
 <td valign="top" style="white-space: pre;">SubClassOf(<span class="name">T</span>(Qualifiers) <span class="name">T</span>(Class-ID) <span class="name">T</span>(rel(Rel-ID TargetClass-ID Qualifiers)) )</td>
 </tr>
